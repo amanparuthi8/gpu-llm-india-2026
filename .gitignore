@@ -66,3 +66,4 @@ temp/
 
 # Large binary files (add specific ones if needed)
 # *.pdf  # Uncomment if you don't want PDFs tracked
+.DS_Store
