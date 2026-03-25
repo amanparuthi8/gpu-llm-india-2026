@@ -1,164 +1,239 @@
-# GPU Cloud, LLM Hardware & AI Infrastructure
-## Comprehensive Comparison — India 2026
+# GPU & LLM Infrastructure Advisor — India 2026
 
-> **March 2026 · 1 USD ≈ ₹86.5 · All prices in Indian Rupees (INR)**
-
-A complete reference guide for Indian AI developers and enterprises evaluating LLM inference hardware and GPU cloud platforms — from ₹7,200 Raspberry Pi edge kits to ₹43-lakh production clusters and cloud GPU instances.
+> **Local app · zero cloud dependency · uses your existing Claude Pro or ChatGPT Plus**  
+> March 2026 · All prices in INR · 1 USD = ₹86.5
 
 ---
 
-## 📁 Repository Contents
+## What This Is
 
-| File | Description |
-|------|-------------|
-| `GPU_LLM_Infrastructure_India_2026.docx` | Full report — 8 sections, all tables, all platforms |
-| `advisor/index.html` | Interactive infrastructure advisor tool (open in browser) |
-| `README.md` | This file |
+A local desktop app that takes your workload requirements and recommends the right GPU/LLM infrastructure — from a ₹57,900 Mac Mini to a ₹43-lakh production cluster to India-sovereign cloud. It uses your existing Claude Pro or ChatGPT Plus subscription to generate the recommendation, so you don't need to buy a separate API key.
 
 ---
 
-## 🔍 What's Covered
+## Quick Start
 
-### 8 Hardware Platforms
-| Platform | VRAM | Price (INR) | Best For |
-|----------|------|-------------|----------|
-| Mac Mini M4 (16 GB) | 16 GB unified | ₹57,900 | Personal dev, 7B models |
-| Mac Mini M4 Pro (64 GB) | 64 GB unified | ₹1,69,900 | Team dev, 30B models |
-| Mac Studio M4 Max (128 GB) | 128 GB unified | ~₹4,19,000 | Solo researcher, 70B models |
-| NVIDIA DGX Spark | 128 GB LPDDR5X | ₹4,06,454 | CUDA dev, up to 200B models |
-| NVIDIA Jetson AGX Thor | 128 GB unified | ~₹2,16,250 | Edge AI, robotics, kiosks |
-| TAALAS — 10× RTX 4090 | 240 GB GDDR6X | ~₹38–43 lakhs | Production multi-user API |
-| Cloud H100 80GB | 80 GB HBM3 | ₹162–604/hr | Burst training, scalable inference |
-| Raspberry Pi 5 + AI Kit | 8 GB | ~₹7,200 | Education, prototyping |
+### Mac / Linux
+```bash
+bash launch.sh
+```
+Or double-click `launch.sh` from Finder.
 
-### Performance Metrics Benchmarked
-- Token generation speed (tok/s) at 7B and 70B INT4
-- Prompt evaluation / prefill rate (tokens/s)
-- Power consumption (Watts, idle and load)
-- Cooling requirements
-- GPU utilisation %
-- Multi-user concurrent serving capacity
-- Data sovereignty classification
-- Quality rating (★–★★★★★)
+### Windows
+Double-click `launch.bat`
+
+The launcher will:
+1. Check for Node.js v18+
+2. If missing — ask your permission, then install it automatically
+3. Start the server at `http://localhost:3131`
+4. Open your browser automatically
 
 ---
 
-## ☁️ Cloud Providers Compared
+## File Structure
 
-### Global (9 providers)
-AWS EC2 p5, Google Cloud A3, Azure NC H100 v5, Oracle Cloud, Lambda Labs, RunPod, CoreWeave, Vast.ai — with break-even analysis vs DGX Spark one-time purchase.
-
-### India — 100% Data Sovereign (7 providers)
-| Provider | GPU | INR/hr | IndiaAI Mission |
-|----------|-----|--------|-----------------|
-| Yotta Shakti Cloud | H100/GH200/B200 (32,768 GPUs) | ₹115–400 | ✓ Empanelled |
-| Jio Cloud | NVIDIA GH200 | ₹200–350 | ✓ Empanelled |
-| Sify CloudInfinit+AI | H100/H200/L4 (DGX-Ready) | ₹200–380 | ✓ Empanelled |
-| AdaniConneX | Colo (bring your own GPU) | Rack-based | Partner |
-| E2E Networks | H100 Hopper + InfiniBand | ₹150–250 | ✓ Empanelled |
-| Tata Communications | Hopper + Blackwell 2026 | ₹220–400 | ✓ Empanelled |
-| CDAC / PARAM Rudra | H100/A100/MI300X | ₹115–150 (subsidised) | Core provider |
-
-> **IndiaAI Mission:** ₹115–150/hr subsidised rates for eligible Indian startups building foundation AI models. Apply at [indiaai.gov.in](https://indiaai.gov.in)
+```
+gpu-advisor/
+├── launch.sh          ← Mac/Linux launcher (double-click or bash launch.sh)
+├── launch.bat         ← Windows launcher (double-click)
+├── server.js          ← Node.js backend (zero npm deps — pure built-ins)
+├── package.json       ← Metadata only, no dependencies
+└── public/
+    └── index.html     ← Full UI (auth + advisor form + results)
+```
 
 ---
 
-## 🗂️ India AI Ecosystem Classification (34 entities)
+## Auth Options
 
-All 34 entities from the Indian AI ecosystem classified across 4 tiers:
+### Option 1 — Claude Pro (setup-token)
 
-- 🟢 **DC / Cloud Infrastructure** — AdaniConneX, Jio Cloud, Yotta, Sify, E2E Networks, Tata Comm, AnantRaj Cloud
-- 🟡 **Hardware / Infra Vendors** — Schneider Electric, Supermicro, Arista, CommScope, Corning, DDN, AMD, Velankani
-- 🟣 **AI Startups / LLM Builders** — AI4Bharat, Gnani.ai, BharatGPT, BharatGen, Soket AI Labs, Eros AI, and more
-- 🔴 **Not Cloud / Infra Related** — True Fan, Plivo, Virtual Eye, MyBlue, Constl, and others
+Requires the `claude` CLI to be installed.
 
----
+**How it works:**
+1. App shows you a terminal command: `claude setup-token`
+2. You run it in your terminal
+3. CLI prints: `export CLAUDE_CODE_OAUTH_TOKEN=sk-ant-st01-xxxxxxx...`
+4. Copy **just the token value** — `sk-ant-st01-xxxxxxx...` — not the `export` line
+5. Paste it into the app
+6. Server uses `Authorization: Bearer <token>` to call `api.anthropic.com`
 
-## ⚡ Vera CPU & Dynamo 1.0 (GTC March 16, 2026)
+**Install claude CLI if you don't have it:**
+```bash
+npm install -g @anthropic-ai/claude-code
+```
 
-Breaking announcements from NVIDIA GTC 2026, 2 days before this report:
-
-| Layer | Technology | Key Fact |
-|-------|-----------|----------|
-| Inference OS | **Dynamo 1.0** (open-source) | Up to **7× inference boost** on existing Blackwell hardware — free today |
-| CPU | **Vera CPU** | NVIDIA's custom CPU for agentic AI workloads |
-| Compute | **Vera Rubin NVL72** | 10× throughput/watt vs Blackwell (coming 2026) |
-| Decode | **Groq 3 LPX** | 35× inference throughput per megawatt |
-
----
-
-## 💡 Cost Reduction Techniques
-
-10 techniques with quantified savings:
-
-| Technique | Memory | Speed | Energy |
-|-----------|--------|-------|--------|
-| INT4 / Q4 Quantization | 4–8× | 2–3× | 40–60% |
-| FP4 Quantization (NVIDIA native) | 8–10× | 3–5× | 50–70% |
-| KV Cache + Offloading (Dynamo KVBM) | — | +30–60% | 20–40% |
-| Context Optimisation + RAG | — | 2–16× | 40–80% |
-| Microsoft BitNet b1.58 (1-bit LLM) | Up to 32× | 2–6× | 72–82% |
-| Speculative Decoding | — | 2–4× | 20–30% |
-| Continuous Batching (PagedAttention) | — | 3–10× GPU util | 30–50% |
-| NVIDIA Dynamo 1.0 | — | Up to 7× | 30–50% |
-| Model Distillation + LoRA | 70–90% | 5–15× | 70–85% |
-| **Full Stack Combined** | **4–8×** | **7–20×** | **60–80%** |
+**Token lifetime:** ~1 hour. After expiry, run `claude setup-token` again.
 
 ---
 
-## 🧮 Break-Even Calculator
+### Option 2 — ChatGPT Plus (OAuth)
 
-> **How long until DGX Spark (₹4,06,454 one-time) pays for itself vs cloud?**
+No CLI needed. Full browser-based OAuth flow.
 
-| Provider | INR/hr | Monthly (8h/day) | Break-Even |
-|----------|--------|-----------------|------------|
-| Azure NC H100 v5 | ₹604 | ₹4,34,749 | **0.9 months** |
-| CoreWeave | ₹533 | ₹3,83,628 | 1.1 months |
-| AWS p5.48xlarge | ₹340 | ₹2,44,795 | 1.7 months |
-| Google Cloud A3 | ₹260 | ₹1,86,840 | 2.2 months |
-| Yotta Shakti | ₹200 | ₹1,44,000 | 2.8 months |
-| Oracle Cloud | ₹108 | ₹77,850 | 5.2 months |
+**How it works:**
+1. Click "Open ChatGPT Sign-in"
+2. Server generates PKCE verifier + challenge, builds auth URL
+3. New browser tab opens at `auth.openai.com`
+4. You sign in with your OpenAI account
+5. OpenAI redirects to `http://localhost:3131/auth/callback`
+6. Server exchanges the code for an access token (server-side, never touches browser)
+7. Token stored in memory, browser redirected back to advisor
 
----
-
-## 🛠️ Infrastructure Advisor
-
-Open `advisor/index.html` in your browser for an interactive tool that recommends the right infrastructure based on your:
-- Daily usage hours (ad-hoc / fixed hours / 24×7)
-- Budget constraints
-- Project type (inference, fine-tuning, edge AI, RAG, etc.)
-- Data sovereignty requirements
-- Team size / concurrent users
+**Uses:** `api.openai.com/v1/chat/completions` with `gpt-4o`
 
 ---
 
-## 📋 Methodology & Disclaimers
+### Option 3 — API Key (BYOK)
 
-- All pricing as of **March 2026**
-- Cloud GPU prices are highly dynamic — verify before procurement
-- Token generation benchmarks use **Ollama / vLLM** with Llama 3.1 7B Q4_K_M and Llama 3.3 70B / DeepSeek R1 70B at INT4/Q4
-- IndiaAI Mission pricing applies only to eligible Indian entities building foundation AI models
-- DGX Spark MSRP: $4,699 / ₹4,06,454 (post Feb 2026 revision)
-- Monthly cloud cost formula: `hourly rate × 8 hrs × 30 days`
-- Data sovereignty classifications are indicative — verify with provider for regulatory compliance
+Paste any Anthropic or OpenAI API key. Stored in memory only — never written to disk.
+
+- Claude API keys: `sk-ant-api03-...`
+- OpenAI API keys: `sk-...`
 
 ---
 
-## 🔗 Key Resources
+## How the Recommendation Works
 
-- [IndiaAI Mission Compute Portal](https://indiaai.gov.in)
-- [NVIDIA DGX Spark](https://www.nvidia.com/en-in/products/workstations/dgx-spark/)
-- [NVIDIA Dynamo 1.0 (open-source)](https://github.com/ai-dynamo/dynamo)
-- [Yotta Shakti Cloud](https://shakticloud.ai)
-- [E2E Networks GPU Cloud](https://www.e2enetworks.com)
-- [Microsoft BitNet (bitnet.cpp)](https://github.com/microsoft/BitNet)
+Once authenticated, you fill in:
+
+| Field | Options |
+|-------|---------|
+| Expected Run Time | Ad-hoc / Fixed hours/day (slider 1–24h) / 24x7 Always-on |
+| Concurrent users | 1 / 2-5 / 10-25 / 25+ |
+| Primary use case | Inference · Fine-tuning · RAG · Edge AI · Research · Multimodal · Agentic · Education |
+| Model size | ≤3B / 7B / 13-30B / 70B / 100B+ |
+| Data sovereignty | India-only (DPDP/BFSI) / Prefer India / No restriction |
+| Budget | None / Monthly cap / One-time CapEx |
+| CUDA required | Yes / No / Either |
+| Deployment | On-premise / Cloud / Hybrid |
+
+The server sends this to Claude Sonnet 4.6 or GPT-4o with a structured prompt referencing all current India 2026 hardware prices.
+
+**Response structure:**
+- ⚡ Top recommendation + rationale
+- 🏆 Why it fits your specific requirements
+- 💰 Monthly + annual cost in INR
+- ⚙️ Key optimisations (INT4 quant / Dynamo 1.0 / KV cache / IndiaAI subsidy)
+- 🔄 Two alternatives in a table
+- ⚠️ Gotchas for your setup
 
 ---
 
-## 📄 License
+## Hardware Database (baked into prompt)
 
-This research report is released for informational purposes. Data compiled from public sources, vendor documentation, and community benchmarks. Not financial or procurement advice.
+### On-premise devices
+
+| Device | VRAM | Price (INR) | Best For |
+|--------|------|-------------|----------|
+| Raspberry Pi 5 + AI Kit | 8 GB | ~₹7,200 | Education only |
+| Jetson Orin Nano Super 8GB | 8 GB | ~₹21,600 | Budget edge AI |
+| Mac Mini M4 16GB | 16 GB unified | ₹57,900 | Personal 7B |
+| Mac Mini M4 Pro 64GB | 64 GB unified | ₹1,69,900 | Solo dev 30B |
+| Minisforum MS-S1 Max | 128 GB unified | ~₹1,75,000 | AMD Strix Halo, dual 10GbE |
+| Jetson AGX Thor 128GB | 128 GB unified | ~₹2,16,250 | Edge AI / Robotics |
+| HP ZGX Nano G1n | 128 GB unified | ~₹2,59,500 | GB10, ZGX Toolkit |
+| MSI EdgeXpert MS-C931 | 128 GB unified | ~₹2,59,500 | GB10, cheapest |
+| ASUS Ascent GX10 | 128 GB unified | ~₹3,02,500 | GB10, best cooling |
+| Dell Pro Max GB10 | 128 GB unified | ~₹3,46,000 | GB10, enterprise |
+| NVIDIA DGX Spark | 128 GB LPDDR5X | ₹4,06,454 | GB10, reference |
+| Mac Studio M4 Max 128GB | 128 GB unified | ~₹4,19,000 | Silent 70B |
+| TAALAS 10x RTX 4090 | 240 GB GDDR6X | ₹38-43 lakhs | Production 25 users |
+
+### India cloud (100% sovereign)
+
+| Provider | Rate (INR/hr) | Notes |
+|----------|--------------|-------|
+| Yotta Shakti | ₹115-400 | IndiaAI subsidy ₹115/hr available |
+| E2E Networks | ₹150-250 | Per-minute billing |
+| Jio Cloud | ₹200-350 | Azure-backed, GH200 |
+| Sify CloudInfinit+AI | ₹200-380 | DGX-Ready certified |
+| Tata Communications | ₹220-400 | Blackwell roadmap 2026 |
+| CDAC / PARAM Rudra | ₹115-150 | Research only, 40-100% subsidy |
+
+### Global cloud
+
+| Provider | Rate (INR/hr/GPU) | Break-even vs DGX Spark |
+|----------|------------------|------------------------|
+| Oracle Cloud | ₹108 | 5.2 months |
+| Vast.ai | ₹162 | 3.5 months |
+| RunPod | ₹172 | 3.3 months |
+| Lambda Labs | ₹259 | 2.2 months |
+| GCP A3-High | ₹260 | 2.2 months |
+| AWS p5.48xlarge | ₹340 | 1.7 months |
+| CoreWeave | ₹533 | 1.1 months |
+| Azure NC H100 v5 | ₹604 | 0.9 months |
 
 ---
 
-*Compiled by Amandeep Singh Paruthi · March 2026*
+## Node.js Auto-Install Logic
+
+| Platform | Methods tried (in order) |
+|----------|--------------------------|
+| macOS | Homebrew → nvm → official .pkg installer |
+| Linux | apt (NodeSource) → dnf → yum → pacman → nvm |
+| Windows | winget → PowerShell MSI download |
+
+---
+
+## Privacy & Security
+
+| Concern | What this app does |
+|---------|-------------------|
+| Token storage | RAM only — nothing written to disk |
+| Logging | Errors to terminal only — no request logging |
+| On exit | All session tokens cleared |
+| Browser storage | `sessionStorage` only (tab-scoped, not `localStorage`) |
+| Network binding | `127.0.0.1` only — not accessible from network |
+| Dependencies | Zero npm packages — pure Node.js built-ins only |
+
+---
+
+## Troubleshooting
+
+**"Failed to fetch" on any button**  
+Server is not running. Re-run `bash launch.sh` or `node server.js`.
+
+**Claude: "Token format invalid"**  
+Copy only the token from `claude setup-token` output:  
+✓ `sk-ant-st01-xxxx...`  
+✗ `export CLAUDE_CODE_OAUTH_TOKEN=sk-ant-st01-xxxx...`
+
+**Claude: session expired mid-use**  
+Setup-tokens last ~1 hour. Run `claude setup-token` again. Or use an API key which has no expiry.
+
+**ChatGPT: OAuth fails or blank screen**  
+The OAuth client ID may not have localhost registered with OpenAI's Auth0. Use the API key option instead — get a key from [platform.openai.com](https://platform.openai.com).
+
+**Port 3131 already in use**
+```bash
+# Mac/Linux
+lsof -ti:3131 | xargs kill
+# Windows
+netstat -ano | findstr :3131
+taskkill /PID <pid> /F
+```
+
+---
+
+## Requirements
+
+- Node.js v18+ (auto-installed by launcher if missing)
+- Internet connection
+- One of: Claude Pro + `claude` CLI · ChatGPT Plus · Any API key
+
+---
+
+## Related Files in This Project
+
+| File | Contents |
+|------|----------|
+| `GPU_LLM_Infrastructure_India_2026_v3.docx` | Full 17-platform comparison report with all tables |
+| `advisor/index.html` | Standalone static advisor (no auth, client-side scoring only) |
+| `GPU_LLM_Infrastructure_India_2026_v3.docx` | Section 0: VRAM-first selection framework |
+
+---
+
+*Prices as of March 2026. Cloud GPU prices are highly dynamic — verify before procurement.*  
+*IndiaAI Mission subsidised rates apply only to eligible Indian entities building foundation AI models.*  
+*Apply at [indiaai.gov.in](https://indiaai.gov.in)*

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPU & LLM Infrastructure Advisor — India 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0a0e1a;
+  --bg2:     #111827;
+  --bg3:     #1a2235;
+  --border:  rgba(99,179,237,0.13);
+  --border2: rgba(99,179,237,0.28);
+  --text:    #e2e8f0;
+  --muted:   #718096;
+  --accent:  #63b3ed;
+  --accent2: #76e4f7;
+  --gold:    #f6c90e;
+  --green:   #68d391;
+  --red:     #fc8181;
+  --amber:   #f6ad55;
+  --purple:  #b794f4;
+  --mono:    'Space Mono', monospace;
+  --sans:    'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(99,179,237,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,179,237,0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none; z-index: 0;
+}
+
+.wrap { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* ── Header ── */
+header { padding: 48px 0 36px; text-align: center; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 18px;
+}
+.eyebrow::before, .eyebrow::after { content: ''; display: block; height: 1px; width: 36px; background: var(--accent); }
+h1 {
+  font-family: var(--mono); font-size: clamp(20px, 3.5vw, 32px); font-weight: 700; line-height: 1.25;
+  background: linear-gradient(135deg, #fff 30%, var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.tagline { font-size: 14px; color: var(--muted); }
+
+/* ── Auth screen ── */
+#authScreen { display: block; }
+#advisorScreen { display: none; }
+#resultScreen { display: none; }
+
+.auth-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 18px; padding: 40px; margin-bottom: 20px;
+  animation: fadeUp 0.4s ease;
+}
+.section-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border2); }
+
+.auth-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.auth-btn {
+  border: 1px solid var(--border2); border-radius: 12px;
+  background: var(--bg3); padding: 20px 16px;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.auth-btn:hover { border-color: var(--accent); background: rgba(99,179,237,0.07); transform: translateY(-2px); }
+.auth-btn.selected { border-color: var(--accent); background: rgba(99,179,237,0.12); }
+.auth-btn .icon { font-size: 28px; }
+.auth-btn .label { font-size: 14px; font-weight: 600; color: var(--text); }
+.auth-btn .sublabel { font-size: 11px; color: var(--muted); }
+.auth-btn .badge {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+  padding: 2px 8px; border-radius: 100px;
+  background: rgba(104,211,145,0.12); color: var(--green);
+  border: 1px solid rgba(104,211,145,0.2);
+}
+
+.divider { text-align: center; color: var(--muted); font-size: 12px; margin: 16px 0; position: relative; }
+.divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: var(--border2); }
+.divider::before { left: 0; } .divider::after { right: 0; }
+
+.byok-row { display: flex; gap: 10px; align-items: stretch; }
+.byok-input {
+  flex: 1; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px;
+  color: var(--text); font-family: var(--mono); font-size: 13px;
+  padding: 10px 14px; outline: none; transition: border-color 0.2s;
+}
+.byok-input:focus { border-color: var(--accent); }
+.byok-input::placeholder { color: var(--muted); font-size: 12px; }
+.btn-sm {
+  padding: 10px 18px; border-radius: 8px; border: 1px solid var(--border2);
+  background: var(--bg3); color: var(--accent); font-family: var(--mono);
+  font-size: 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.btn-sm:hover { border-color: var(--accent); background: rgba(99,179,237,0.1); }
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 100px; font-size: 12px;
+  font-family: var(--mono); letter-spacing: 0.5px;
+}
+.status-pill.authed  { background: rgba(104,211,145,0.1); color: var(--green);  border: 1px solid rgba(104,211,145,0.2); }
+.status-pill.pending { background: rgba(246,173,85,0.1);  color: var(--amber);  border: 1px solid rgba(246,173,85,0.2);  }
+.status-pill.error   { background: rgba(252,129,129,0.1); color: var(--red);    border: 1px solid rgba(252,129,129,0.2); }
+.status-pill.dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.btn-primary {
+  width: 100%; padding: 15px; border-radius: 12px;
+  background: linear-gradient(135deg, #2b6cb0, #1a4f8a);
+  border: 1px solid rgba(99,179,237,0.35); color: #fff;
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+  transition: all 0.2s; margin-top: 20px;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(99,179,237,0.18); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ── Advisor form ── */
+.form-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 32px 36px; margin-bottom: 20px;
+  transition: border-color 0.3s; animation: fadeUp 0.4s ease;
+}
+.form-card:hover { border-color: var(--border2); }
+
+label {
+  display: block; font-size: 12px; font-weight: 500; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
+}
+label span.req { color: var(--accent); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip input { display: none; }
+.chip label {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 15px; border-radius: 100px;
+  border: 1px solid var(--border2); background: var(--bg3);
+  color: var(--muted); font-size: 13px; font-weight: 400;
+  letter-spacing: 0; cursor: pointer; transition: all 0.2s;
+  text-transform: none;
+}
+.chip input:checked + label { background: rgba(99,179,237,0.14); border-color: var(--accent); color: var(--accent2); }
+.chip label:hover { border-color: var(--accent); color: var(--text); }
+
+.slider-row { display: flex; align-items: center; gap: 16px; }
+input[type=range] {
+  flex: 1; -webkit-appearance: none; height: 4px;
+  background: var(--border2); border-radius: 2px; outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px;
+  border-radius: 50%; background: var(--accent); cursor: pointer;
+}
+.slider-val { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--accent2); min-width: 60px; text-align: right; }
+
+select {
+  width: 100%; padding: 10px 14px; border-radius: 8px;
+  border: 1px solid var(--border2); background: var(--bg3);
+  color: var(--text); font-family: var(--sans); font-size: 14px; outline: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2363b3ed' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
+}
+select option { background: var(--bg2); }
+
+.budget-wrap {
+  display: flex; align-items: center;
+  border: 1px solid var(--border2); border-radius: 8px;
+  background: var(--bg3); overflow: hidden;
+}
+.budget-prefix { padding: 10px 14px; background: rgba(99,179,237,0.07); font-family: var(--mono); font-size: 13px; color: var(--accent); border-right: 1px solid var(--border2); }
+.budget-wrap input {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: var(--mono); font-size: 14px; padding: 10px 14px;
+}
+.budget-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* ── Results ── */
+#resultScreen { animation: fadeUp 0.5s ease; }
+.result-header { font-family: var(--mono); font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--green); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+.result-header::before { content: '▸'; font-size: 14px; }
+.result-header::after { content: ''; flex: 1; height: 1px; background: rgba(104,211,145,0.2); }
+
+.result-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 32px; margin-bottom: 18px;
+}
+.result-card .markdown-body { font-size: 14px; line-height: 1.7; color: var(--text); }
+.markdown-body h2 { font-family: var(--mono); font-size: 13px; color: var(--accent2); margin: 20px 0 8px; letter-spacing: 0.5px; }
+.markdown-body h3 { font-size: 13px; color: var(--accent); margin: 16px 0 6px; }
+.markdown-body ul { padding-left: 20px; }
+.markdown-body li { margin-bottom: 4px; }
+.markdown-body table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+.markdown-body th { background: var(--bg3); padding: 8px 12px; text-align: left; font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
+.markdown-body td { padding: 8px 12px; border-top: 1px solid var(--border); }
+.markdown-body strong { color: var(--accent2); }
+.markdown-body code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.markdown-body blockquote { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--muted); margin: 12px 0; }
+.markdown-body p { margin-bottom: 10px; }
+
+.back-btn { background: none; border: 1px solid var(--border2); color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: 1px; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; margin-bottom: 20px; }
+.back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Loading spinner ── */
+.spinner-wrap { text-align: center; padding: 60px 20px; }
+.spinner { width: 40px; height: 40px; border: 3px solid rgba(99,179,237,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 20px; }
+@keyframes spin  { to { transform: rotate(360deg); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+.loading-text { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+.progress-dots::after { content: '...'; animation: dots 1.5s steps(4, end) infinite; }
+@keyframes dots { 0%,100%{content:'   '} 25%{content:'.  '} 50%{content:'.. '} 75%{content:'...'} }
+
+/* ── Provider badge on advisor screen ── */
+.provider-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 24px; }
+.provider-info { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.provider-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.switch-btn { font-family: var(--mono); font-size: 10px; color: var(--muted); cursor: pointer; letter-spacing: 0.5px; text-decoration: underline; background: none; border: none; }
+.switch-btn:hover { color: var(--accent); }
+
+/* ── Field spacing ── */
+.field { margin-bottom: 26px; }
+.field:last-child { margin-bottom: 0; }
+
+/* ── Auth waiting ── */
+.auth-waiting { text-align: center; padding: 30px 0 10px; }
+.auth-waiting p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.auth-waiting .cancel-btn { font-size: 12px; color: var(--muted); cursor: pointer; background: none; border: none; text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .auth-methods { grid-template-columns: 1fr; }
+  .form-card { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">India AI Infrastructure Advisor</div>
+  <h1>GPU & LLM Infrastructure<br>Recommendation Engine</h1>
+  <p class="tagline">Sign in with your existing subscription · March 2026 · All prices in INR</p>
+</header>
+
+<!-- ════════════════════════════════════════════════════
+     SCREEN 1: AUTH
+═══════════════════════════════════════════════════════ -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="section-label">01 — Sign In to Your Subscription</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6">
+      Use your existing Claude Pro or ChatGPT Plus — no new API key purchase required.
+      Tokens are held only in memory and cleared when you close the app.
+    </p>
+
+    <!-- Provider selection -->
+    <div class="auth-methods" id="providerSelect">
+      <div class="auth-btn" id="claudeBtn" onclick="selectProvider('claude')">
+        <span class="icon">🟣</span>
+        <span class="label">Claude Pro</span>
+        <span class="sublabel">claude.ai subscription</span>
+        <span class="badge">SETUP-TOKEN</span>
+      </div>
+      <div class="auth-btn" id="chatgptBtn" onclick="selectProvider('chatgpt')">
+        <span class="icon">🟢</span>
+        <span class="label">ChatGPT Plus</span>
+        <span class="sublabel">OpenAI subscription</span>
+        <span class="badge">OAUTH</span>
+      </div>
+    </div>
+
+    <!-- Claude: setup-token paste flow -->
+    <div id="claudeFlow" style="display:none;margin-top:18px">
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:16px 18px;margin-bottom:16px">
+        <p style="font-size:12px;font-family:var(--mono);color:var(--accent);margin-bottom:10px;letter-spacing:0.5px">STEP 1 — Open your terminal and run:</p>
+        <div style="background:#0a0e1a;border-radius:6px;padding:10px 14px;font-family:var(--mono);font-size:14px;color:var(--accent2);display:flex;align-items:center;justify-content:space-between">
+          <span>claude setup-token</span>
+          <button onclick="copyCmd()" style="background:rgba(99,179,237,0.1);border:1px solid var(--border2);color:var(--accent);font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer">COPY</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px">Then copy the full token it prints (starts with <code style="font-family:var(--mono);color:var(--accent)">sk-ant-st01-</code>)</p>
+      </div>
+      <p style="font-size:12px;font-family:var(--mono);color:var(--accent);margin-bottom:8px;letter-spacing:0.5px">STEP 2 — Paste token here:</p>
+      <div class="byok-row">
+        <input class="byok-input" id="setupToken" type="password" placeholder="sk-ant-st01-...">
+        <button class="btn-sm" id="tokenSubmitBtn" onclick="submitSetupToken()">Connect</button>
+      </div>
+      <button class="cancel-btn" style="margin-top:10px;font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer" onclick="resetProviderSelect()">← Back</button>
+    </div>
+
+    <!-- ChatGPT: OAuth browser flow -->
+    <div id="chatgptFlow" style="display:none;margin-top:18px">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Click below — a browser tab will open for you to sign in with your OpenAI account.</p>
+      <button class="btn-primary" style="margin-top:0" onclick="startChatGPTOAuth()">Open ChatGPT Sign-in</button>
+
+      <div id="chatgptWaiting" style="display:none;text-align:center;padding:24px 0">
+        <div class="spinner" style="margin:0 auto 12px"></div>
+        <p style="font-size:13px;color:var(--muted)">Waiting for sign-in to complete<span class="progress-dots"></span></p>
+        <button class="cancel-btn" onclick="cancelChatGPTOAuth()" style="margin-top:8px;font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer">Cancel</button>
+      </div>
+      <button class="cancel-btn" style="margin-top:10px;font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer" onclick="resetProviderSelect()">← Back</button>
+    </div>
+
+    <div id="authStatus" style="margin-top:14px;min-height:24px;text-align:center"></div>
+
+    <div class="divider">or use an API key directly</div>
+
+    <div>
+      <div class="chips" style="margin-bottom:10px">
+        <div class="chip"><input type="radio" name="byokProvider" id="bp_claude" value="claude" checked><label for="bp_claude">Claude API key</label></div>
+        <div class="chip"><input type="radio" name="byokProvider" id="bp_openai" value="openai"><label for="bp_openai">OpenAI API key</label></div>
+      </div>
+      <div class="byok-row">
+        <input class="byok-input" id="byokKey" type="password" placeholder="sk-ant-api... or sk-...">
+        <button class="btn-sm" onclick="useBYOK()">Use Key</button>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:6px">Key stored in memory only — never written to disk or logged.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SCREEN 2: ADVISOR FORM
+═══════════════════════════════════════════════════════ -->
+<div id="advisorScreen">
+
+  <div class="provider-bar">
+    <div class="provider-info">
+      <span class="provider-dot"></span>
+      <span id="providerLabel" style="font-size:13px">Connected</span>
+    </div>
+    <button class="switch-btn" onclick="switchProvider()">Switch provider</button>
+  </div>
+
+  <!-- 01: USAGE PATTERN -->
+  <div class="form-card">
+    <div class="section-label">01 — Expected Run Time</div>
+
+    <div class="field">
+      <label>How do you plan to use this? <span class="req">*</span></label>
+      <div class="chips" id="usageChips">
+        <div class="chip"><input type="radio" name="usage" id="u_adhoc" value="adhoc"><label for="u_adhoc"><span>⚡</span> Ad-hoc / On-demand</label></div>
+        <div class="chip"><input type="radio" name="usage" id="u_daily" value="daily" checked><label for="u_daily"><span>🕐</span> Fixed hours/day</label></div>
+        <div class="chip"><input type="radio" name="usage" id="u_247" value="247"><label for="u_247"><span>♾️</span> 24×7 Always-on</label></div>
+      </div>
+    </div>
+
+    <div class="field" id="hoursField">
+      <label>Hours per day</label>
+      <div class="slider-row">
+        <input type="range" id="hoursPerDay" min="1" max="24" value="8" oninput="document.getElementById('hoursVal').textContent=this.value+' hrs'">
+        <span class="slider-val" id="hoursVal">8 hrs</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Concurrent users / API requests <span class="req">*</span></label>
+      <div class="chips">
+        <div class="chip"><input type="radio" name="users" id="usr1" value="Just me (1)" checked><label for="usr1">Just me (1)</label></div>
+        <div class="chip"><input type="radio" name="users" id="usr5" value="Small team (2–5)"><label for="usr5">Small team (2–5)</label></div>
+        <div class="chip"><input type="radio" name="users" id="usr20" value="API / 10–25"><label for="usr20">API / 10–25</label></div>
+        <div class="chip"><input type="radio" name="users" id="usr100" value="Production 25+"><label for="usr100">Production 25+</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02: PROJECT TYPE -->
+  <div class="form-card">
+    <div class="section-label">02 — Primary Use Case</div>
+
+    <div class="field">
+      <div class="chips">
+        <div class="chip"><input type="radio" name="projectType" id="pt_inf" value="LLM Inference / Chatbot / API"><label for="pt_inf">LLM Inference / Chatbot / API</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_ft" value="Fine-tuning / Training custom models"><label for="pt_ft">Fine-tuning / Training</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_rag" value="RAG / Knowledge base / Document QA"><label for="pt_rag">RAG / Document QA</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_edge" value="Edge AI / Robotics / Kiosk / Embedded"><label for="pt_edge">Edge AI / Robotics / Kiosk</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_res" value="Research / Experimentation / Dev" checked><label for="pt_res">Research / Dev</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_mm" value="Multimodal (Vision + LLM)"><label for="pt_mm">Multimodal</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_ag" value="Agentic AI / Autonomous agents"><label for="pt_ag">Agentic AI</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_edu" value="Education / Prototyping / Learning"><label for="pt_edu">Education / Prototyping</label></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Target model size <span class="req">*</span></label>
+      <div class="chips">
+        <div class="chip"><input type="radio" name="modelSize" id="ms_1b" value="≤3B params"><label for="ms_1b">≤3B params</label></div>
+        <div class="chip"><input type="radio" name="modelSize" id="ms_7b" value="7B params" checked><label for="ms_7b">7B params</label></div>
+        <div class="chip"><input type="radio" name="modelSize" id="ms_13b" value="13–30B params"><label for="ms_13b">13–30B params</label></div>
+        <div class="chip"><input type="radio" name="modelSize" id="ms_70b" value="70B params"><label for="ms_70b">70B params</label></div>
+        <div class="chip"><input type="radio" name="modelSize" id="ms_120b" value="100B+ params"><label for="ms_120b">100B+ params</label></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Data sovereignty <span class="req">*</span></label>
+      <div class="chips">
+        <div class="chip"><input type="radio" name="sovereignty" id="sov_full" value="India-only (DPDP / BFSI / Govt)"><label for="sov_full">🇮🇳 India-only</label></div>
+        <div class="chip"><input type="radio" name="sovereignty" id="sov_pref" value="Prefer India, global OK"><label for="sov_pref">Prefer India</label></div>
+        <div class="chip"><input type="radio" name="sovereignty" id="sov_any" value="No restriction" checked><label for="sov_any">No restriction</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03: BUDGET -->
+  <div class="form-card">
+    <div class="section-label">03 — Budget & Deployment</div>
+
+    <div class="field">
+      <label>Budget type</label>
+      <div class="chips" style="margin-bottom:14px">
+        <div class="chip"><input type="radio" name="budgetType" id="bt_none" value="none" checked><label for="bt_none">No limit</label></div>
+        <div class="chip"><input type="radio" name="budgetType" id="bt_monthly" value="monthly"><label for="bt_monthly">Monthly cap</label></div>
+        <div class="chip"><input type="radio" name="budgetType" id="bt_capex" value="capex"><label for="bt_capex">One-time CapEx</label></div>
+      </div>
+      <div id="budgetInput" style="display:none">
+        <div class="budget-wrap">
+          <span class="budget-prefix">₹</span>
+          <input type="number" id="budgetAmount" placeholder="e.g. 200000" min="0">
+        </div>
+        <p id="budgetHint" style="font-size:11px;color:var(--muted);margin-top:5px">/ month</p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>CUDA / NVIDIA required?</label>
+      <div class="chips">
+        <div class="chip"><input type="radio" name="cuda" id="cuda_yes" value="Yes — must have CUDA"><label for="cuda_yes">Yes — must have CUDA</label></div>
+        <div class="chip"><input type="radio" name="cuda" id="cuda_no" value="No — Apple/AMD fine"><label for="cuda_no">No preference</label></div>
+        <div class="chip"><input type="radio" name="cuda" id="cuda_any" value="No preference" checked><label for="cuda_any">Either</label></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Deployment</label>
+      <div class="chips">
+        <div class="chip"><input type="radio" name="deploy" id="dep_onprem" value="On-premise only"><label for="dep_onprem">🏢 On-premise only</label></div>
+        <div class="chip"><input type="radio" name="deploy" id="dep_cloud" value="Cloud only"><label for="dep_cloud">☁️ Cloud only</label></div>
+        <div class="chip"><input type="radio" name="deploy" id="dep_hybrid" value="Hybrid / Either" checked><label for="dep_hybrid">🔀 Hybrid</label></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="analyseBtn" onclick="getRecommendation()">
+    ▸ &nbsp; Analyse &amp; Recommend Infrastructure
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     SCREEN 3: RESULT
+═══════════════════════════════════════════════════════ -->
+<div id="resultScreen">
+  <button class="back-btn" onclick="goBack()">← New query</button>
+  <div class="result-header">AI-Generated Recommendation</div>
+  <div class="result-card">
+    <div id="resultLoading" class="spinner-wrap">
+      <div class="spinner"></div>
+      <p class="loading-text">Analysing your requirements<span class="progress-dots"></span></p>
+    </div>
+    <div id="resultContent" class="markdown-body" style="display:none"></div>
+  </div>
+  <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:16px">
+    Prices as of March 2026 — verify before procurement · All recommendations in INR · 1 USD = ₹86.5
+  </p>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let sessionId     = null;
+let authProvider  = null;
+let pollInterval  = null;
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  // Check for OAuth callback redirect
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('authed') === '1') {
+    sessionId    = params.get('session');
+    authProvider = params.get('provider');
+    window.history.replaceState({}, '', '/');
+    onAuthSuccess();
+    return;
+  }
+
+  // Restore session from sessionStorage
+  const stored = sessionStorage.getItem('advisorSession');
+  if (stored) {
+    try {
+      const s = JSON.parse(stored);
+      if (s.sessionId) { sessionId = s.sessionId; authProvider = s.provider; onAuthSuccess(true); return; }
+    } catch {}
+  }
+
+  // Wire up form listeners
+  document.querySelectorAll('input[name="usage"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.getElementById('hoursField').style.display = r.value === 'daily' ? 'block' : 'none';
+    });
+  });
+  document.querySelectorAll('input[name="budgetType"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.getElementById('budgetInput').style.display = r.value !== 'none' ? 'block' : 'none';
+      document.getElementById('budgetHint').textContent = r.value === 'capex' ? 'one-time CapEx' : '/ month';
+    });
+  });
+});
+
+// ── Provider selection ────────────────────────────────────────────────────────
+function selectProvider(p) {
+  document.getElementById('claudeBtn').classList.toggle('selected', p === 'claude');
+  document.getElementById('chatgptBtn').classList.toggle('selected', p === 'chatgpt');
+  document.getElementById('claudeFlow').style.display  = p === 'claude'  ? 'block' : 'none';
+  document.getElementById('chatgptFlow').style.display = p === 'chatgpt' ? 'block' : 'none';
+}
+
+function resetProviderSelect() {
+  document.getElementById('claudeBtn').classList.remove('selected');
+  document.getElementById('chatgptBtn').classList.remove('selected');
+  document.getElementById('claudeFlow').style.display  = 'none';
+  document.getElementById('chatgptFlow').style.display = 'none';
+  document.getElementById('chatgptWaiting').style.display = 'none';
+  clearInterval(pollInterval);
+  setStatus('', '');
+}
+
+function copyCmd() {
+  navigator.clipboard.writeText('claude setup-token').then(() => {
+    setStatus('authed', 'Command copied to clipboard');
+    setTimeout(() => setStatus('', ''), 2000);
+  });
+}
+
+// ── Claude: setup-token paste flow ────────────────────────────────────────────
+async function submitSetupToken() {
+  const token = document.getElementById('setupToken').value.trim();
+  if (!token) return setStatus('error', 'Please paste your setup token');
+
+  const btn = document.getElementById('tokenSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Validating...';
+  setStatus('pending', 'Validating token with Anthropic...');
+
+  try {
+    // Get a sessionId first
+    const startRes = await fetch('/auth/start', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider: 'claude' }),
+    });
+    const startData = await startRes.json();
+    sessionId = startData.sessionId;
+
+    // Submit the token
+    const res = await fetch('/auth/token', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, token }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Token validation failed');
+
+    authProvider = 'claude';
+    onAuthSuccess();
+  } catch (e) {
+    setStatus('error', e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Connect';
+  }
+}
+
+// ── ChatGPT: OAuth browser flow ───────────────────────────────────────────────
+async function startChatGPTOAuth() {
+  setStatus('pending', 'Starting OAuth...');
+
+  let startData;
+  try {
+    const res = await fetch('/auth/start', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider: 'chatgpt' }),
+    });
+    startData = await res.json();
+    if (!res.ok) throw new Error(startData.error);
+  } catch (e) {
+    return setStatus('error', `Could not start: ${e.message}`);
+  }
+
+  sessionId = startData.sessionId;
+  authProvider = 'chatgpt';
+
+  window.open(startData.authUrl, '_blank');
+  document.getElementById('chatgptWaiting').style.display = 'block';
+  setStatus('pending', 'Complete sign-in in the browser tab...');
+
+  // Poll for token
+  let attempts = 0;
+  pollInterval = setInterval(async () => {
+    if (++attempts > 120) {
+      clearInterval(pollInterval);
+      document.getElementById('chatgptWaiting').style.display = 'none';
+      return setStatus('error', 'Timed out. Please try again.');
+    }
+    try {
+      const r = await fetch('/auth/status', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      });
+      const s = await r.json();
+      if (s.authed) {
+        clearInterval(pollInterval);
+        document.getElementById('chatgptWaiting').style.display = 'none';
+        onAuthSuccess();
+      }
+    } catch {}
+  }, 1000);
+}
+
+function cancelChatGPTOAuth() {
+  clearInterval(pollInterval);
+  document.getElementById('chatgptWaiting').style.display = 'none';
+  setStatus('', '');
+}
+
+// ── BYOK ──────────────────────────────────────────────────────────────────────
+async function useBYOK() {
+  const key      = document.getElementById('byokKey').value.trim();
+  const provider = document.querySelector('input[name="byokProvider"]:checked').value;
+  if (!key) return setStatus('error', 'Please enter an API key');
+
+  try {
+    const res = await fetch('/api/byok', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider, apiKey: key }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    sessionId    = data.sessionId;
+    authProvider = provider + '-byok';
+    onAuthSuccess();
+  } catch (e) {
+    setStatus('error', e.message);
+  }
+}
+
+// ── Post-auth ─────────────────────────────────────────────────────────────────
+function onAuthSuccess(silent = false) {
+  sessionStorage.setItem('advisorSession', JSON.stringify({ sessionId, provider: authProvider }));
+
+  const labels = {
+    'claude':      '🟣 Claude Pro (setup-token)',
+    'chatgpt':     '🟢 ChatGPT Plus (OAuth)',
+    'claude-byok': '🔑 Claude (API Key)',
+    'openai-byok': '🔑 OpenAI (API Key)',
+  };
+  document.getElementById('providerLabel').textContent = labels[authProvider] || authProvider;
+
+  if (!silent) setStatus('authed', 'Connected successfully');
+  setTimeout(() => {
+    document.getElementById('authScreen').style.display   = 'none';
+    document.getElementById('advisorScreen').style.display = 'block';
+    document.getElementById('resultScreen').style.display  = 'none';
+  }, silent ? 0 : 500);
+}
+
+function switchProvider() {
+  sessionStorage.removeItem('advisorSession');
+  sessionId = null; authProvider = null;
+  resetProviderSelect();
+  document.getElementById('authScreen').style.display    = 'block';
+  document.getElementById('advisorScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display  = 'none';
+  setStatus('', '');
+}
+
+function setStatus(type, msg) {
+  const el = document.getElementById('authStatus');
+  if (!type) { el.innerHTML = ''; return; }
+  el.innerHTML = `<span class="status-pill ${type} dot">${msg}</span>`;
+}
+
+// ── Get recommendation ────────────────────────────────────────────────────────
+async function getRecommendation() {
+  const usage      = document.querySelector('input[name="usage"]:checked')?.value;
+  const users      = document.querySelector('input[name="users"]:checked')?.value;
+  const projectType = document.querySelector('input[name="projectType"]:checked')?.value;
+  const modelSize  = document.querySelector('input[name="modelSize"]:checked')?.value;
+  const sovereignty = document.querySelector('input[name="sovereignty"]:checked')?.value;
+  const cuda       = document.querySelector('input[name="cuda"]:checked')?.value;
+  const deploy     = document.querySelector('input[name="deploy"]:checked')?.value;
+  const budgetType = document.querySelector('input[name="budgetType"]:checked')?.value;
+  const budget     = budgetType !== 'none'
+    ? `₹${document.getElementById('budgetAmount').value || 'unspecified'} (${budgetType})`
+    : 'No limit';
+  const hours = document.getElementById('hoursPerDay').value;
+
+  if (!projectType) return alert('Please select a primary use case.');
+
+  document.getElementById('advisorScreen').style.display = 'none';
+  document.getElementById('resultScreen').style.display  = 'block';
+  document.getElementById('resultLoading').style.display = 'block';
+  document.getElementById('resultContent').style.display = 'none';
+  document.getElementById('resultContent').innerHTML = '';
+
+  try {
+    const res = await fetch('/api/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        requirements: { usage, hours, users, projectType, modelSize, sovereignty, cuda, deploy, budget },
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    renderMarkdown(data.recommendation);
+  } catch (e) {
+    document.getElementById('resultLoading').style.display = 'none';
+    document.getElementById('resultContent').style.display = 'block';
+    document.getElementById('resultContent').innerHTML =
+      `<p style="color:var(--red)">⚠️ ${e.message}</p>
+       <p style="color:var(--muted);font-size:13px;margin-top:8px">
+       Check that your session is still valid. <a href="#" onclick="switchProvider()" style="color:var(--accent)">Sign in again</a></p>`;
+  }
+}
+
+function goBack() {
+  document.getElementById('resultScreen').style.display  = 'none';
+  document.getElementById('advisorScreen').style.display = 'block';
+}
+
+// ── Markdown renderer (minimal, no deps) ──────────────────────────────────────
+function renderMarkdown(md) {
+  document.getElementById('resultLoading').style.display = 'none';
+  document.getElementById('resultContent').style.display = 'block';
+
+  let html = md
+    // Tables
+    .replace(/\|(.+)\|\n\|[-|: ]+\|\n((?:\|.+\|\n?)+)/g, (_, header, rows) => {
+      const ths = header.split('|').filter(s => s.trim()).map(s => `<th>${s.trim()}</th>`).join('');
+      const trs = rows.trim().split('\n').map(row => {
+        const tds = row.split('|').filter(s => s.trim()).map(s => `<td>${s.trim()}</td>`).join('');
+        return `<tr>${tds}</tr>`;
+      }).join('');
+      return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+    })
+    // Headings
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // Blockquote
+    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+    // Lists
+    .replace(/^\s*[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/((<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>')
+    // Paragraphs
+    .replace(/\n\n(?!<[uoth])/g, '</p><p>')
+    .replace(/^(?!<[uothbl])(.+)$/gm, (l) => l.startsWith('<') ? l : l);
+
+  html = `<p>${html}</p>`;
+  document.getElementById('resultContent').innerHTML = html;
+}
+</script>
+</body>
+</html>
