@@ -4,11 +4,14 @@
   "description": "GPU & LLM Infrastructure Advisor — India 2026",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node bootstrap.js && node server.js"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "private": true,
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@mariozechner/pi-ai": "^0.62.0"
+  }
 }

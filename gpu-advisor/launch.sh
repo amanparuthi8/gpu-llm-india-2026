@@ -6,7 +6,7 @@
 
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MIN_NODE_MAJOR=18
+MIN_NODE_MAJOR=20
 
 # ── Terminal title ────────────────────────────────────────────────────────────
 echo -e "\033[1;36m"
@@ -123,4 +123,4 @@ echo "  → Press Ctrl+C to stop"
 echo ""
 
 cd "$SCRIPT_DIR"
-node server.js
+npm start

@@ -8,254 +8,147 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:      #0a0e1a;
-  --bg2:     #111827;
-  --bg3:     #1a2235;
-  --border:  rgba(99,179,237,0.13);
-  --border2: rgba(99,179,237,0.28);
-  --text:    #e2e8f0;
-  --muted:   #718096;
-  --accent:  #63b3ed;
-  --accent2: #76e4f7;
-  --gold:    #f6c90e;
-  --green:   #68d391;
-  --red:     #fc8181;
-  --amber:   #f6ad55;
-  --purple:  #b794f4;
-  --mono:    'Space Mono', monospace;
-  --sans:    'DM Sans', sans-serif;
+  --bg:      #0a0e1a; --bg2: #111827; --bg3: #1a2235;
+  --border:  rgba(99,179,237,.13); --border2: rgba(99,179,237,.28);
+  --text:    #e2e8f0; --muted: #718096;
+  --accent:  #63b3ed; --accent2: #76e4f7;
+  --gold:    #f6c90e; --green: #68d391; --red: #fc8181;
+  --amber:   #f6ad55; --purple: #b794f4; --teal: #4fd1c5;
+  --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(99,179,237,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(99,179,237,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 24px 80px}
 
-body {
-  font-family: var(--sans);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(99,179,237,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99,179,237,0.025) 1px, transparent 1px);
-  background-size: 44px 44px;
-  pointer-events: none; z-index: 0;
-}
+header{padding:48px 0 36px;text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:18px}
+.eyebrow::before,.eyebrow::after{content:'';display:block;height:1px;width:36px;background:var(--accent)}
+h1{font-family:var(--mono);font-size:clamp(20px,3.5vw,32px);font-weight:700;line-height:1.25;background:linear-gradient(135deg,#fff 30%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.tagline{font-size:14px;color:var(--muted)}
 
-.wrap { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 0 24px 80px; }
+/* Auth card */
+.auth-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:40px;margin-bottom:20px;animation:fadeUp .4s ease}
+.section-label{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border2)}
+/* Offline bypass button */
+.offline-bypass{display:block;width:100%;padding:14px;margin-top:20px;border-radius:12px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:var(--mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:center}
+.offline-bypass:hover{border-color:var(--purple);color:var(--purple);background:rgba(183,148,244,.06)}
+.offline-bypass .sub-hint{display:block;font-family:var(--sans);font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;margin-top:4px}
 
-/* ── Header ── */
-header { padding: 48px 0 36px; text-align: center; }
-.eyebrow {
-  display: inline-flex; align-items: center; gap: 10px;
-  font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  margin-bottom: 18px;
-}
-.eyebrow::before, .eyebrow::after { content: ''; display: block; height: 1px; width: 36px; background: var(--accent); }
-h1 {
-  font-family: var(--mono); font-size: clamp(20px, 3.5vw, 32px); font-weight: 700; line-height: 1.25;
-  background: linear-gradient(135deg, #fff 30%, var(--accent2));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
-}
-.tagline { font-size: 14px; color: var(--muted); }
+.divider{text-align:center;color:var(--muted);font-size:12px;font-weight: bold;margin:10px 0;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:41%;height:2px;background:var(--border2)}
+.divider::before{left:0}.divider::after{right:0}
+.byok-row{display:flex;gap:10px;align-items:stretch}
+.byok-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;outline:none;transition:border-color .2s}
+.byok-input:focus{border-color:var(--accent)}
+.byok-input::placeholder{color:var(--muted);font-size:12px}
+.btn-sm{padding:10px 18px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--accent);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-sm:hover{border-color:var(--accent);background:rgba(99,179,237,.1)}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;font-size:12px;font-family:var(--mono);letter-spacing:.5px}
+.status-pill.authed{background:rgba(104,211,145,.1);color:var(--green);border:1px solid rgba(104,211,145,.2)}
+.status-pill.pending{background:rgba(246,173,85,.1);color:var(--amber);border:1px solid rgba(246,173,85,.2)}
+.status-pill.error{background:rgba(252,129,129,.1);color:var(--red);border:1px solid rgba(252,129,129,.2)}
+.status-pill.dot::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.auth-note{margin-bottom:18px;padding:14px 16px;border:1px solid rgba(246,173,85,.22);border-radius:12px;background:rgba(246,173,85,.06);font-size:12px;line-height:1.6;color:#fbd38d}
+.btn-primary{width:100%;padding:15px;border-radius:12px;background:linear-gradient(135deg,#2b6cb0,#1a4f8a);border:1px solid rgba(99,179,237,.35);color:#fff;font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:20px}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(99,179,237,.18)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
 
-/* ── Auth screen ── */
-#authScreen { display: block; }
-#advisorScreen { display: none; }
-#resultScreen { display: none; }
+/* Form */
+.form-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px 36px;margin-bottom:20px;transition:border-color .3s;animation:fadeUp .4s ease}
+.form-card:hover{border-color:var(--border2)}
+label{display:block;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+label span.req{color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip input{display:none}
+.chip label{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:100px;border:1px solid var(--border2);background:var(--bg3);color:var(--muted);font-size:13px;font-weight:400;letter-spacing:0;cursor:pointer;transition:all .2s;text-transform:none}
+.chip input:checked+label{background:rgba(99,179,237,.14);border-color:var(--accent);color:var(--accent2)}
+.chip label:hover{border-color:var(--accent);color:var(--text)}
+.slider-row{display:flex;align-items:center;gap:16px}
+input[type=range]{flex:1;-webkit-appearance:none;height:4px;background:var(--border2);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer}
+.slider-val{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--accent2);min-width:60px;text-align:right}
+.budget-wrap{display:flex;align-items:center;border:1px solid var(--border2);border-radius:8px;background:var(--bg3);overflow:hidden}
+.budget-prefix{padding:10px 14px;background:rgba(99,179,237,.07);font-family:var(--mono);font-size:13px;color:var(--accent);border-right:1px solid var(--border2)}
+.budget-wrap input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:14px;padding:10px 14px}
+.budget-wrap input::-webkit-inner-spin-button{-webkit-appearance:none}
+.provider-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border:1px solid var(--border);border-radius:10px;margin-bottom:24px}
+.provider-bar.offline-bar{background:rgba(183,148,244,.05);border-color:rgba(183,148,244,.25)}
+.provider-bar.ai-bar{background:rgba(104,211,145,.05);border-color:rgba(104,211,145,.25)}
+.provider-dot{width:8px;height:8px;border-radius:50%}
+.switch-btn{font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer;letter-spacing:.5px;text-decoration:underline;background:none;border:none}
+.switch-btn:hover{color:var(--accent)}
+.field{margin-bottom:26px}.field:last-child{margin-bottom:0}
 
-.auth-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 18px; padding: 40px; margin-bottom: 20px;
-  animation: fadeUp 0.4s ease;
-}
-.section-label {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 20px;
-  display: flex; align-items: center; gap: 10px;
-}
-.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border2); }
+/* Offline results — metric cards */
+.rec-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden;transition:border-color .2s}
+.rec-card:hover{border-color:var(--border2)}
+.rec-card.top{border-color:rgba(246,201,14,.3)}
+.rec-head{padding:18px 24px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border)}
+.rec-rank{font-family:var(--mono);font-size:11px;letter-spacing:1px;padding:4px 10px;border-radius:100px;white-space:nowrap;flex-shrink:0}
+.rank-top{background:rgba(246,201,14,.15);color:var(--gold)}
+.rank-n{background:rgba(99,179,237,.1);color:var(--accent)}
+.rec-name{font-size:16px;font-weight:700;flex:1}
+.rec-price{font-family:var(--mono);font-size:13px;color:var(--accent2);white-space:nowrap;flex-shrink:0}
+.rec-score{font-family:var(--mono);font-size:12px;color:var(--muted);flex-shrink:0}
+.rec-body{padding:18px 24px}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.metric{background:var(--bg3);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+.metric-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.metric-val{font-family:var(--mono);font-size:13px;font-weight:700}
+.mv-green{color:var(--green)}.mv-amber{color:var(--amber)}.mv-red{color:var(--red)}.mv-blue{color:var(--accent2)}.mv-teal{color:var(--teal)}.mv-purple{color:var(--purple)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tag{font-size:11px;padding:3px 10px;border-radius:100px;font-weight:500}
+.tag.good{background:rgba(104,211,145,.1);color:var(--green);border:1px solid rgba(104,211,145,.2)}
+.tag.warn{background:rgba(246,173,85,.1);color:var(--amber);border:1px solid rgba(246,173,85,.2)}
+.tag.info{background:rgba(99,179,237,.1);color:var(--accent);border:1px solid rgba(99,179,237,.2)}
+.tag.sov{background:rgba(104,211,145,.08);color:var(--green);border:1px solid rgba(104,211,145,.15)}
+.tag.sov-warn{background:rgba(246,173,85,.08);color:var(--amber);border:1px solid rgba(246,173,85,.15)}
+.opts-section{margin-top:6px}
+.opts-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.opts-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.opt-row{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:8px;margin-bottom:6px;background:var(--bg3);border:1px solid var(--border)}
+.opt-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.opt-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.opt-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.opt-gain{font-family:var(--mono);font-size:11px;color:var(--green);margin-left:auto;white-space:nowrap;flex-shrink:0;padding-top:2px}
 
-.auth-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
-.auth-btn {
-  border: 1px solid var(--border2); border-radius: 12px;
-  background: var(--bg3); padding: 20px 16px;
-  cursor: pointer; transition: all 0.2s; text-align: center;
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-}
-.auth-btn:hover { border-color: var(--accent); background: rgba(99,179,237,0.07); transform: translateY(-2px); }
-.auth-btn.selected { border-color: var(--accent); background: rgba(99,179,237,0.12); }
-.auth-btn .icon { font-size: 28px; }
-.auth-btn .label { font-size: 14px; font-weight: 600; color: var(--text); }
-.auth-btn .sublabel { font-size: 11px; color: var(--muted); }
-.auth-btn .badge {
-  font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
-  padding: 2px 8px; border-radius: 100px;
-  background: rgba(104,211,145,0.12); color: var(--green);
-  border: 1px solid rgba(104,211,145,0.2);
-}
+/* LLM result markdown */
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 32px;margin-bottom:18px}
+.markdown-body{font-size:14px;line-height:1.7;color:var(--text)}
+.markdown-body h2{font-family:var(--mono);font-size:13px;color:var(--accent2);margin:20px 0 8px;letter-spacing:.5px}
+.markdown-body ul{padding-left:20px}.markdown-body li{margin-bottom:4px}
+.markdown-body table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+.markdown-body th{background:var(--bg3);padding:8px 12px;text-align:left;font-size:11px;color:var(--muted);letter-spacing:.5px}
+.markdown-body td{padding:8px 12px;border-top:1px solid var(--border)}
+.markdown-body strong{color:var(--accent2)}
+.markdown-body code{background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.markdown-body p{margin-bottom:10px}
 
-.divider { text-align: center; color: var(--muted); font-size: 12px; margin: 16px 0; position: relative; }
-.divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: var(--border2); }
-.divider::before { left: 0; } .divider::after { right: 0; }
+.res-header{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--green);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.res-header::before{content:'▸';font-size:14px}
+.res-header::after{content:'';flex:1;height:1px;background:rgba(104,211,145,.2)}
+.back-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:1px;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .2s;margin-bottom:20px}
+.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+.mode-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:4px 12px;border-radius:100px;margin-bottom:16px}
+.mode-badge.offline{background:rgba(183,148,244,.1);color:var(--purple);border:1px solid rgba(183,148,244,.2)}
+.mode-badge.ai{background:rgba(104,211,145,.1);color:var(--green);border:1px solid rgba(104,211,145,.2)}
 
-.byok-row { display: flex; gap: 10px; align-items: stretch; }
-.byok-input {
-  flex: 1; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px;
-  color: var(--text); font-family: var(--mono); font-size: 13px;
-  padding: 10px 14px; outline: none; transition: border-color 0.2s;
-}
-.byok-input:focus { border-color: var(--accent); }
-.byok-input::placeholder { color: var(--muted); font-size: 12px; }
-.btn-sm {
-  padding: 10px 18px; border-radius: 8px; border: 1px solid var(--border2);
-  background: var(--bg3); color: var(--accent); font-family: var(--mono);
-  font-size: 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
-}
-.btn-sm:hover { border-color: var(--accent); background: rgba(99,179,237,0.1); }
+/* Spinner */
+.spinner-wrap{text-align:center;padding:60px 20px}
+.spinner{width:40px;height:40px;border:3px solid rgba(99,179,237,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.loading-text{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:1px}
+.progress-dots::after{content:'...';animation:dots 1.5s steps(4,end) infinite}
+@keyframes dots{0%,100%{content:'   '}25%{content:'.  '}50%{content:'.. '}75%{content:'...'}}
 
-.status-pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 14px; border-radius: 100px; font-size: 12px;
-  font-family: var(--mono); letter-spacing: 0.5px;
-}
-.status-pill.authed  { background: rgba(104,211,145,0.1); color: var(--green);  border: 1px solid rgba(104,211,145,0.2); }
-.status-pill.pending { background: rgba(246,173,85,0.1);  color: var(--amber);  border: 1px solid rgba(246,173,85,0.2);  }
-.status-pill.error   { background: rgba(252,129,129,0.1); color: var(--red);    border: 1px solid rgba(252,129,129,0.2); }
-.status-pill.dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.summary-box{background:linear-gradient(135deg,rgba(99,179,237,.05),rgba(118,228,247,.05));border:1px solid rgba(99,179,237,.2);border-radius:12px;padding:16px 20px;margin-bottom:20px;font-size:14px;line-height:1.7}
+.summary-box strong{color:var(--accent2)}
+.disclaimer{text-align:center;font-size:11px;color:var(--muted);margin-top:30px;line-height:1.6;border-top:1px solid var(--border);padding-top:18px}
 
-.btn-primary {
-  width: 100%; padding: 15px; border-radius: 12px;
-  background: linear-gradient(135deg, #2b6cb0, #1a4f8a);
-  border: 1px solid rgba(99,179,237,0.35); color: #fff;
-  font-family: var(--mono); font-size: 13px; font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
-  transition: all 0.2s; margin-top: 20px;
-}
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(99,179,237,0.18); }
-.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-/* ── Advisor form ── */
-.form-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 16px; padding: 32px 36px; margin-bottom: 20px;
-  transition: border-color 0.3s; animation: fadeUp 0.4s ease;
-}
-.form-card:hover { border-color: var(--border2); }
-
-label {
-  display: block; font-size: 12px; font-weight: 500; color: var(--muted);
-  text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
-}
-label span.req { color: var(--accent); }
-
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip input { display: none; }
-.chip label {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 15px; border-radius: 100px;
-  border: 1px solid var(--border2); background: var(--bg3);
-  color: var(--muted); font-size: 13px; font-weight: 400;
-  letter-spacing: 0; cursor: pointer; transition: all 0.2s;
-  text-transform: none;
-}
-.chip input:checked + label { background: rgba(99,179,237,0.14); border-color: var(--accent); color: var(--accent2); }
-.chip label:hover { border-color: var(--accent); color: var(--text); }
-
-.slider-row { display: flex; align-items: center; gap: 16px; }
-input[type=range] {
-  flex: 1; -webkit-appearance: none; height: 4px;
-  background: var(--border2); border-radius: 2px; outline: none;
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 18px; height: 18px;
-  border-radius: 50%; background: var(--accent); cursor: pointer;
-}
-.slider-val { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--accent2); min-width: 60px; text-align: right; }
-
-select {
-  width: 100%; padding: 10px 14px; border-radius: 8px;
-  border: 1px solid var(--border2); background: var(--bg3);
-  color: var(--text); font-family: var(--sans); font-size: 14px; outline: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2363b3ed' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;
-}
-select option { background: var(--bg2); }
-
-.budget-wrap {
-  display: flex; align-items: center;
-  border: 1px solid var(--border2); border-radius: 8px;
-  background: var(--bg3); overflow: hidden;
-}
-.budget-prefix { padding: 10px 14px; background: rgba(99,179,237,0.07); font-family: var(--mono); font-size: 13px; color: var(--accent); border-right: 1px solid var(--border2); }
-.budget-wrap input {
-  flex: 1; background: transparent; border: none; outline: none;
-  color: var(--text); font-family: var(--mono); font-size: 14px; padding: 10px 14px;
-}
-.budget-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-/* ── Results ── */
-#resultScreen { animation: fadeUp 0.5s ease; }
-.result-header { font-family: var(--mono); font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--green); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
-.result-header::before { content: '▸'; font-size: 14px; }
-.result-header::after { content: ''; flex: 1; height: 1px; background: rgba(104,211,145,0.2); }
-
-.result-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 14px; padding: 28px 32px; margin-bottom: 18px;
-}
-.result-card .markdown-body { font-size: 14px; line-height: 1.7; color: var(--text); }
-.markdown-body h2 { font-family: var(--mono); font-size: 13px; color: var(--accent2); margin: 20px 0 8px; letter-spacing: 0.5px; }
-.markdown-body h3 { font-size: 13px; color: var(--accent); margin: 16px 0 6px; }
-.markdown-body ul { padding-left: 20px; }
-.markdown-body li { margin-bottom: 4px; }
-.markdown-body table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
-.markdown-body th { background: var(--bg3); padding: 8px 12px; text-align: left; font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
-.markdown-body td { padding: 8px 12px; border-top: 1px solid var(--border); }
-.markdown-body strong { color: var(--accent2); }
-.markdown-body code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 12px; color: var(--accent); }
-.markdown-body blockquote { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--muted); margin: 12px 0; }
-.markdown-body p { margin-bottom: 10px; }
-
-.back-btn { background: none; border: 1px solid var(--border2); color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: 1px; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; margin-bottom: 20px; }
-.back-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-/* ── Loading spinner ── */
-.spinner-wrap { text-align: center; padding: 60px 20px; }
-.spinner { width: 40px; height: 40px; border: 3px solid rgba(99,179,237,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 20px; }
-@keyframes spin  { to { transform: rotate(360deg); } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
-.loading-text { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 1px; }
-.progress-dots::after { content: '...'; animation: dots 1.5s steps(4, end) infinite; }
-@keyframes dots { 0%,100%{content:'   '} 25%{content:'.  '} 50%{content:'.. '} 75%{content:'...'} }
-
-/* ── Provider badge on advisor screen ── */
-.provider-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 24px; }
-.provider-info { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-.provider-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-.switch-btn { font-family: var(--mono); font-size: 10px; color: var(--muted); cursor: pointer; letter-spacing: 0.5px; text-decoration: underline; background: none; border: none; }
-.switch-btn:hover { color: var(--accent); }
-
-/* ── Field spacing ── */
-.field { margin-bottom: 26px; }
-.field:last-child { margin-bottom: 0; }
-
-/* ── Auth waiting ── */
-.auth-waiting { text-align: center; padding: 30px 0 10px; }
-.auth-waiting p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
-.auth-waiting .cancel-btn { font-size: 12px; color: var(--muted); cursor: pointer; background: none; border: none; text-decoration: underline; }
-
-@media (max-width: 600px) {
-  .auth-methods { grid-template-columns: 1fr; }
-  .form-card { padding: 24px 20px; }
-}
+@media(max-width:600px){.form-card{padding:24px 20px}.metrics-grid{grid-template-columns:1fr 1fr}.rec-head{flex-wrap:wrap;gap:8px}}
 </style>
 </head>
 <body>
@@ -264,111 +157,139 @@ select option { background: var(--bg2); }
 <header>
   <div class="eyebrow">India AI Infrastructure Advisor</div>
   <h1>GPU & LLM Infrastructure<br>Recommendation Engine</h1>
-  <p class="tagline">Sign in with your existing subscription · March 2026 · All prices in INR</p>
+  <p class="tagline">March 2026 · All prices in INR · 17 platforms · India-sovereign cloud included</p>
 </header>
 
-<!-- ════════════════════════════════════════════════════
-     SCREEN 1: AUTH
-═══════════════════════════════════════════════════════ -->
+<!-- ══════════════════════ SCREEN 1: AUTH ══════════════════════ -->
 <div id="authScreen">
   <div class="auth-card">
-    <div class="section-label">01 — Sign In to Your Subscription</div>
+    <div class="section-label">Sign In for AI-Powered Recommendations</div>
     <p style="font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.6">
-      Use your existing Claude Pro or ChatGPT Plus — no new API key purchase required.
+      Use ChatGPT OAuth or connect an API key for Anthropic, OpenAI, Gemini, Mistral, Qwen, Kimi, Groq, or DeepSeek.
       Tokens are held only in memory and cleared when you close the app.
     </p>
 
-    <!-- Provider selection -->
-    <div class="auth-methods" id="providerSelect">
-      <div class="auth-btn" id="claudeBtn" onclick="selectProvider('claude')">
-        <span class="icon">🟣</span>
-        <span class="label">Claude Pro</span>
-        <span class="sublabel">claude.ai subscription</span>
-        <span class="badge">SETUP-TOKEN</span>
-      </div>
-      <div class="auth-btn" id="chatgptBtn" onclick="selectProvider('chatgpt')">
-        <span class="icon">🟢</span>
-        <span class="label">ChatGPT Plus</span>
-        <span class="sublabel">OpenAI subscription</span>
-        <span class="badge">OAUTH</span>
-      </div>
-    </div>
-
-    <!-- Claude: setup-token paste flow -->
-    <div id="claudeFlow" style="display:none;margin-top:18px">
-      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:16px 18px;margin-bottom:16px">
-        <p style="font-size:12px;font-family:var(--mono);color:var(--accent);margin-bottom:10px;letter-spacing:0.5px">STEP 1 — Open your terminal and run:</p>
-        <div style="background:#0a0e1a;border-radius:6px;padding:10px 14px;font-family:var(--mono);font-size:14px;color:var(--accent2);display:flex;align-items:center;justify-content:space-between">
-          <span>claude setup-token</span>
-          <button onclick="copyCmd()" style="background:rgba(99,179,237,0.1);border:1px solid var(--border2);color:var(--accent);font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:4px;cursor:pointer">COPY</button>
-        </div>
-        <p style="font-size:12px;color:var(--muted);margin-top:10px">Then copy the full token it prints (starts with <code style="font-family:var(--mono);color:var(--accent)">sk-ant-st01-</code>)</p>
-      </div>
-      <p style="font-size:12px;font-family:var(--mono);color:var(--accent);margin-bottom:8px;letter-spacing:0.5px">STEP 2 — Paste token here:</p>
-      <div class="byok-row">
-        <input class="byok-input" id="setupToken" type="password" placeholder="sk-ant-st01-...">
-        <button class="btn-sm" id="tokenSubmitBtn" onclick="submitSetupToken()">Connect</button>
-      </div>
-      <button class="cancel-btn" style="margin-top:10px;font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer" onclick="resetProviderSelect()">← Back</button>
-    </div>
-
-    <!-- ChatGPT: OAuth browser flow -->
-    <div id="chatgptFlow" style="display:none;margin-top:18px">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Click below — a browser tab will open for you to sign in with your OpenAI account.</p>
-      <button class="btn-primary" style="margin-top:0" onclick="startChatGPTOAuth()">Open ChatGPT Sign-in</button>
-
-      <div id="chatgptWaiting" style="display:none;text-align:center;padding:24px 0">
-        <div class="spinner" style="margin:0 auto 12px"></div>
-        <p style="font-size:13px;color:var(--muted)">Waiting for sign-in to complete<span class="progress-dots"></span></p>
-        <button class="cancel-btn" onclick="cancelChatGPTOAuth()" style="margin-top:8px;font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer">Cancel</button>
-      </div>
-      <button class="cancel-btn" style="margin-top:10px;font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer" onclick="resetProviderSelect()">← Back</button>
+    <div class="auth-note">
+      ChatGPT, Gemini, and Qwen can use OAuth. Anthropic supports either API key or `claude setup-token`.
+      The remaining providers use direct API keys or portal tokens, and Kimi uses its coding endpoint.
+      You can still skip sign-in entirely and use offline dataset mode.
     </div>
 
     <div id="authStatus" style="margin-top:14px;min-height:24px;text-align:center"></div>
 
-    <div class="divider">or use an API key directly</div>
-
-    <div>
-      <div class="chips" style="margin-bottom:10px">
-        <div class="chip"><input type="radio" name="byokProvider" id="bp_claude" value="claude" checked><label for="bp_claude">Claude API key</label></div>
-        <div class="chip"><input type="radio" name="byokProvider" id="bp_openai" value="openai"><label for="bp_openai">OpenAI API key</label></div>
+    <div class="divider">connect with ChatGPT</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn-sm" onclick="useOpenAICodexOAuth()">Sign in with ChatGPT</button>
+      <span style="font-size:11px;color:var(--muted)">Uses OpenAI Codex OAuth in your local browser.</span>
+    </div>
+    <div id="codexOAuthWait" style="display:none;margin-bottom:18px;padding:14px 16px;border:1px solid var(--border2);border-radius:12px;background:var(--bg3)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div class="spinner" style="width:18px;height:18px;border-width:2px;margin:0"></div>
+        <div style="font-size:12px;color:var(--text);font-family:var(--mono)">Waiting for ChatGPT OAuth<span class="progress-dots"></span></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+        If the browser did not open, use the link below or paste the full redirect URL / authorization code manually.
+      </div>
+      <div style="margin-bottom:10px;font-size:11px">
+        <a id="codexOAuthLink" href="#" target="_blank" rel="noopener noreferrer" style="color:var(--accent);word-break:break-all;display:none"></a>
       </div>
       <div class="byok-row">
-        <input class="byok-input" id="byokKey" type="password" placeholder="sk-ant-api... or sk-...">
-        <button class="btn-sm" onclick="useBYOK()">Use Key</button>
+        <input class="byok-input" id="codexManualCode" type="text" placeholder="Paste redirect URL or authorization code">
+        <button class="btn-sm" onclick="submitOpenAICodexCode()">Submit</button>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin-top:6px">Key stored in memory only — never written to disk or logged.</p>
     </div>
+
+    <div class="divider">connect with Gemini</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn-sm" onclick="useGeminiOAuth()">Sign in with Gemini</button>
+      <span style="font-size:11px;color:var(--muted)">Uses Gemini CLI OAuth and refresh tokens.</span>
+    </div>
+    <div id="geminiOAuthWait" style="display:none;margin-bottom:18px;padding:14px 16px;border:1px solid var(--border2);border-radius:12px;background:var(--bg3)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div class="spinner" style="width:18px;height:18px;border-width:2px;margin:0"></div>
+        <div style="font-size:12px;color:var(--text);font-family:var(--mono)">Waiting for Gemini OAuth<span class="progress-dots"></span></div>
+      </div>
+      <div id="geminiOAuthInstructions" style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+        If the browser did not open, use the link below or paste the full redirect URL manually.
+      </div>
+      <div style="margin-bottom:10px;font-size:11px">
+        <a id="geminiOAuthLink" href="#" target="_blank" rel="noopener noreferrer" style="color:var(--accent);word-break:break-all;display:none"></a>
+      </div>
+      <div class="byok-row">
+        <input class="byok-input" id="geminiManualCode" type="text" placeholder="Paste Gemini redirect URL">
+        <button class="btn-sm" onclick="submitGeminiOAuthCode()">Submit</button>
+      </div>
+    </div>
+
+    <div class="divider">connect with Qwen</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn-sm" onclick="useQwenOAuth()">Sign in with Qwen</button>
+      <span style="font-size:11px;color:var(--muted)">Uses OAuth 2.0 device flow with refresh tokens.</span>
+    </div>
+    <div id="qwenOAuthWait" style="display:none;margin-bottom:18px;padding:14px 16px;border:1px solid var(--border2);border-radius:12px;background:var(--bg3)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div class="spinner" style="width:18px;height:18px;border-width:2px;margin:0"></div>
+        <div style="font-size:12px;color:var(--text);font-family:var(--mono)">Waiting for Qwen approval<span class="progress-dots"></span></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+        Approve access in your browser. If prompted, enter this device code:
+        <span id="qwenUserCode" style="color:var(--accent2);font-family:var(--mono);margin-left:6px"></span>
+      </div>
+      <div style="margin-bottom:10px;font-size:11px">
+        <a id="qwenOAuthLink" href="#" target="_blank" rel="noopener noreferrer" style="color:var(--accent);word-break:break-all;display:none"></a>
+      </div>
+    </div>
+
+    <div class="divider">connect with Key/Token</div>
+    <div class="chips" style="margin-bottom:10px">
+      <div class="chip"><input type="radio" name="byokProvider" id="bp_anthropic" value="anthropic" checked><label for="bp_anthropic">Anthropic</label></div>
+      <div class="chip"><input type="radio" name="byokProvider" id="bp_openai" value="openai"><label for="bp_openai">OpenAI</label></div>
+      <div class="chip"><input type="radio" name="byokProvider" id="bp_google" value="google"><label for="bp_google">Gemini</label></div>
+      <div class="chip"><input type="radio" name="byokProvider" id="bp_mistral" value="mistral"><label for="bp_mistral">Mistral</label></div>
+      <div class="chip"><input type="radio" name="byokProvider" id="bp_qwen" value="qwen"><label for="bp_qwen">Qwen</label></div>
+      <div class="chip"><input type="radio" name="byokProvider" id="bp_kimi" value="kimi"><label for="bp_kimi">Kimi</label></div>
+      <div class="chip"><input type="radio" name="byokProvider" id="bp_groq" value="groq"><label for="bp_groq">Groq</label></div>
+      <div class="chip"><input type="radio" name="byokProvider" id="bp_deepseek" value="deepseek"><label for="bp_deepseek">DeepSeek</label></div>
+    </div>
+    <div id="anthropicAuthModes" class="chips" style="margin-bottom:10px">
+      <div class="chip"><input type="radio" name="anthropicAuthMode" id="anthropic_api_key" value="api-key" checked><label for="anthropic_api_key">Anthropic API key</label></div>
+      <div class="chip"><input type="radio" name="anthropicAuthMode" id="anthropic_setup_token" value="setup-token"><label for="anthropic_setup_token">Claude setup-token</label></div>
+    </div>
+    <div class="byok-row">
+      <input class="byok-input" id="byokKey" type="password" placeholder="sk-ant-api03-...">
+      <button class="btn-sm" onclick="useBYOK()">Use Key</button>
+    </div>
+    <p id="byokHelp" style="font-size:11px;color:var(--muted);margin-top:6px">Anthropic API key stored in memory only — never written to disk or logged.</p>
+
+    <!-- ── OFFLINE BYPASS ── -->
+    <button class="offline-bypass" onclick="useOfflineMode()">
+      ⚡ Skip sign-in — get instant dataset recommendations
+      <span class="sub-hint">No AI, no account needed · Scored from our 17-platform database · All prices in INR</span>
+    </button>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════
-     SCREEN 2: ADVISOR FORM
-═══════════════════════════════════════════════════════ -->
-<div id="advisorScreen">
+<!-- ══════════════════════ SCREEN 2: ADVISOR FORM ══════════════════════ -->
+<div id="advisorScreen" style="display:none">
 
-  <div class="provider-bar">
-    <div class="provider-info">
-      <span class="provider-dot"></span>
-      <span id="providerLabel" style="font-size:13px">Connected</span>
+  <div class="provider-bar" id="providerBar">
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+      <span class="provider-dot" id="providerDot"></span>
+      <span id="providerLabel"></span>
     </div>
-    <button class="switch-btn" onclick="switchProvider()">Switch provider</button>
+    <button class="switch-btn" onclick="switchProvider()">Switch</button>
   </div>
 
-  <!-- 01: USAGE PATTERN -->
   <div class="form-card">
     <div class="section-label">01 — Expected Run Time</div>
-
     <div class="field">
       <label>How do you plan to use this? <span class="req">*</span></label>
-      <div class="chips" id="usageChips">
-        <div class="chip"><input type="radio" name="usage" id="u_adhoc" value="adhoc"><label for="u_adhoc"><span>⚡</span> Ad-hoc / On-demand</label></div>
-        <div class="chip"><input type="radio" name="usage" id="u_daily" value="daily" checked><label for="u_daily"><span>🕐</span> Fixed hours/day</label></div>
-        <div class="chip"><input type="radio" name="usage" id="u_247" value="247"><label for="u_247"><span>♾️</span> 24×7 Always-on</label></div>
+      <div class="chips">
+        <div class="chip"><input type="radio" name="usage" id="u_adhoc" value="adhoc"><label for="u_adhoc">⚡ Ad-hoc / On-demand</label></div>
+        <div class="chip"><input type="radio" name="usage" id="u_daily" value="daily" checked><label for="u_daily">🕐 Fixed hours/day</label></div>
+        <div class="chip"><input type="radio" name="usage" id="u_247" value="247"><label for="u_247">♾️ 24×7 Always-on</label></div>
       </div>
     </div>
-
     <div class="field" id="hoursField">
       <label>Hours per day</label>
       <div class="slider-row">
@@ -376,60 +297,53 @@ select option { background: var(--bg2); }
         <span class="slider-val" id="hoursVal">8 hrs</span>
       </div>
     </div>
-
     <div class="field">
       <label>Concurrent users / API requests <span class="req">*</span></label>
       <div class="chips">
-        <div class="chip"><input type="radio" name="users" id="usr1" value="Just me (1)" checked><label for="usr1">Just me (1)</label></div>
-        <div class="chip"><input type="radio" name="users" id="usr5" value="Small team (2–5)"><label for="usr5">Small team (2–5)</label></div>
-        <div class="chip"><input type="radio" name="users" id="usr20" value="API / 10–25"><label for="usr20">API / 10–25</label></div>
-        <div class="chip"><input type="radio" name="users" id="usr100" value="Production 25+"><label for="usr100">Production 25+</label></div>
+        <div class="chip"><input type="radio" name="users" id="usr1" value="1" checked><label for="usr1">Just me (1)</label></div>
+        <div class="chip"><input type="radio" name="users" id="usr5" value="5"><label for="usr5">Small team (2–5)</label></div>
+        <div class="chip"><input type="radio" name="users" id="usr20" value="20"><label for="usr20">API / 10–25</label></div>
+        <div class="chip"><input type="radio" name="users" id="usr100" value="100"><label for="usr100">Production 25+</label></div>
       </div>
     </div>
   </div>
 
-  <!-- 02: PROJECT TYPE -->
   <div class="form-card">
     <div class="section-label">02 — Primary Use Case</div>
-
     <div class="field">
       <div class="chips">
-        <div class="chip"><input type="radio" name="projectType" id="pt_inf" value="LLM Inference / Chatbot / API"><label for="pt_inf">LLM Inference / Chatbot / API</label></div>
-        <div class="chip"><input type="radio" name="projectType" id="pt_ft" value="Fine-tuning / Training custom models"><label for="pt_ft">Fine-tuning / Training</label></div>
-        <div class="chip"><input type="radio" name="projectType" id="pt_rag" value="RAG / Knowledge base / Document QA"><label for="pt_rag">RAG / Document QA</label></div>
-        <div class="chip"><input type="radio" name="projectType" id="pt_edge" value="Edge AI / Robotics / Kiosk / Embedded"><label for="pt_edge">Edge AI / Robotics / Kiosk</label></div>
-        <div class="chip"><input type="radio" name="projectType" id="pt_res" value="Research / Experimentation / Dev" checked><label for="pt_res">Research / Dev</label></div>
-        <div class="chip"><input type="radio" name="projectType" id="pt_mm" value="Multimodal (Vision + LLM)"><label for="pt_mm">Multimodal</label></div>
-        <div class="chip"><input type="radio" name="projectType" id="pt_ag" value="Agentic AI / Autonomous agents"><label for="pt_ag">Agentic AI</label></div>
-        <div class="chip"><input type="radio" name="projectType" id="pt_edu" value="Education / Prototyping / Learning"><label for="pt_edu">Education / Prototyping</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_inf" value="inference"><label for="pt_inf">LLM Inference / Chatbot / API</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_ft" value="finetune"><label for="pt_ft">Fine-tuning / Training</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_rag" value="rag"><label for="pt_rag">RAG / Document QA</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_edge" value="edge"><label for="pt_edge">Edge AI / Robotics / Kiosk</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_res" value="research" checked><label for="pt_res">Research / Dev</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_mm" value="multimodal"><label for="pt_mm">Multimodal</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_ag" value="agent"><label for="pt_ag">Agentic AI</label></div>
+        <div class="chip"><input type="radio" name="projectType" id="pt_edu" value="education"><label for="pt_edu">Education / Prototyping</label></div>
       </div>
     </div>
-
     <div class="field">
       <label>Target model size <span class="req">*</span></label>
       <div class="chips">
-        <div class="chip"><input type="radio" name="modelSize" id="ms_1b" value="≤3B params"><label for="ms_1b">≤3B params</label></div>
-        <div class="chip"><input type="radio" name="modelSize" id="ms_7b" value="7B params" checked><label for="ms_7b">7B params</label></div>
-        <div class="chip"><input type="radio" name="modelSize" id="ms_13b" value="13–30B params"><label for="ms_13b">13–30B params</label></div>
-        <div class="chip"><input type="radio" name="modelSize" id="ms_70b" value="70B params"><label for="ms_70b">70B params</label></div>
-        <div class="chip"><input type="radio" name="modelSize" id="ms_120b" value="100B+ params"><label for="ms_120b">100B+ params</label></div>
+        <div class="chip"><input type="radio" name="modelSize" id="ms_1b" value="3"><label for="ms_1b">≤3B params</label></div>
+        <div class="chip"><input type="radio" name="modelSize" id="ms_7b" value="7" checked><label for="ms_7b">7B params</label></div>
+        <div class="chip"><input type="radio" name="modelSize" id="ms_13b" value="30"><label for="ms_13b">13–30B params</label></div>
+        <div class="chip"><input type="radio" name="modelSize" id="ms_70b" value="70"><label for="ms_70b">70B params</label></div>
+        <div class="chip"><input type="radio" name="modelSize" id="ms_120b" value="120"><label for="ms_120b">100B+ params</label></div>
       </div>
     </div>
-
     <div class="field">
       <label>Data sovereignty <span class="req">*</span></label>
       <div class="chips">
-        <div class="chip"><input type="radio" name="sovereignty" id="sov_full" value="India-only (DPDP / BFSI / Govt)"><label for="sov_full">🇮🇳 India-only</label></div>
-        <div class="chip"><input type="radio" name="sovereignty" id="sov_pref" value="Prefer India, global OK"><label for="sov_pref">Prefer India</label></div>
-        <div class="chip"><input type="radio" name="sovereignty" id="sov_any" value="No restriction" checked><label for="sov_any">No restriction</label></div>
+        <div class="chip"><input type="radio" name="sovereignty" id="sov_full" value="india"><label for="sov_full">🇮🇳 India-only (DPDP/BFSI)</label></div>
+        <div class="chip"><input type="radio" name="sovereignty" id="sov_pref" value="prefer"><label for="sov_pref">Prefer India</label></div>
+        <div class="chip"><input type="radio" name="sovereignty" id="sov_any" value="any" checked><label for="sov_any">No restriction</label></div>
       </div>
     </div>
   </div>
 
-  <!-- 03: BUDGET -->
   <div class="form-card">
     <div class="section-label">03 — Budget & Deployment</div>
-
     <div class="field">
       <label>Budget type</label>
       <div class="chips" style="margin-bottom:14px">
@@ -445,303 +359,809 @@ select option { background: var(--bg2); }
         <p id="budgetHint" style="font-size:11px;color:var(--muted);margin-top:5px">/ month</p>
       </div>
     </div>
-
     <div class="field">
       <label>CUDA / NVIDIA required?</label>
       <div class="chips">
-        <div class="chip"><input type="radio" name="cuda" id="cuda_yes" value="Yes — must have CUDA"><label for="cuda_yes">Yes — must have CUDA</label></div>
-        <div class="chip"><input type="radio" name="cuda" id="cuda_no" value="No — Apple/AMD fine"><label for="cuda_no">No preference</label></div>
-        <div class="chip"><input type="radio" name="cuda" id="cuda_any" value="No preference" checked><label for="cuda_any">Either</label></div>
+        <div class="chip"><input type="radio" name="cuda" id="cuda_yes" value="yes"><label for="cuda_yes">Yes — must have CUDA</label></div>
+        <div class="chip"><input type="radio" name="cuda" id="cuda_no" value="no"><label for="cuda_no">No — Apple/AMD fine</label></div>
+        <div class="chip"><input type="radio" name="cuda" id="cuda_any" value="any" checked><label for="cuda_any">Either</label></div>
       </div>
     </div>
-
     <div class="field">
-      <label>Deployment</label>
+      <label>Deployment preference</label>
       <div class="chips">
-        <div class="chip"><input type="radio" name="deploy" id="dep_onprem" value="On-premise only"><label for="dep_onprem">🏢 On-premise only</label></div>
-        <div class="chip"><input type="radio" name="deploy" id="dep_cloud" value="Cloud only"><label for="dep_cloud">☁️ Cloud only</label></div>
-        <div class="chip"><input type="radio" name="deploy" id="dep_hybrid" value="Hybrid / Either" checked><label for="dep_hybrid">🔀 Hybrid</label></div>
+        <div class="chip"><input type="radio" name="deploy" id="dep_op" value="onprem"><label for="dep_op">🏢 On-premise only</label></div>
+        <div class="chip"><input type="radio" name="deploy" id="dep_cl" value="cloud"><label for="dep_cl">☁️ Cloud only</label></div>
+        <div class="chip"><input type="radio" name="deploy" id="dep_hy" value="hybrid" checked><label for="dep_hy">🔀 Hybrid / Either</label></div>
       </div>
     </div>
   </div>
 
-  <button class="btn-primary" id="analyseBtn" onclick="getRecommendation()">
-    ▸ &nbsp; Analyse &amp; Recommend Infrastructure
-  </button>
+  <button class="btn-primary" onclick="submit()">▸ &nbsp; Analyse &amp; Recommend Infrastructure</button>
 </div>
 
-<!-- ════════════════════════════════════════════════════
-     SCREEN 3: RESULT
-═══════════════════════════════════════════════════════ -->
-<div id="resultScreen">
+<!-- ══════════════════════ SCREEN 3: RESULTS ══════════════════════ -->
+<div id="resultScreen" style="display:none">
   <button class="back-btn" onclick="goBack()">← New query</button>
-  <div class="result-header">AI-Generated Recommendation</div>
-  <div class="result-card">
-    <div id="resultLoading" class="spinner-wrap">
-      <div class="spinner"></div>
-      <p class="loading-text">Analysing your requirements<span class="progress-dots"></span></p>
+  <div id="modeFlag"></div>
+  <div class="res-header">Infrastructure Recommendations</div>
+  <div id="summaryBox"></div>
+  <div id="recCards"></div>
+  <!-- spinner used only for AI mode -->
+  <div id="llmLoading" style="display:none">
+    <div class="result-card">
+      <div class="spinner-wrap">
+        <div class="spinner"></div>
+        <p class="loading-text">Analysing requirements<span class="progress-dots"></span></p>
+      </div>
     </div>
-    <div id="resultContent" class="markdown-body" style="display:none"></div>
   </div>
-  <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:16px">
-    Prices as of March 2026 — verify before procurement · All recommendations in INR · 1 USD = ₹86.5
+  <div id="llmResult" style="display:none">
+    <div class="result-card"><div class="markdown-body" id="llmContent"></div></div>
+  </div>
+  <p class="disclaimer">
+    All prices as of March 2026. Cloud GPU rates are dynamic — verify before procurement.<br>
+    IndiaAI Mission subsidised rates apply only to eligible Indian entities building foundation AI models.<br>
+    Apply at <a href="https://indiaai.gov.in" target="_blank" style="color:var(--accent)">indiaai.gov.in</a>
+    · DGX Spark $4,699 / ₹4,06,454 · Monthly cloud = rate × hrs × 30 days
   </p>
 </div>
 
 </div><!-- /wrap -->
-
 <script>
-// ── State ─────────────────────────────────────────────────────────────────────
-let sessionId     = null;
-let authProvider  = null;
-let pollInterval  = null;
+// ═══════════════════════════════════════════════════════════
+// DATASET — 17 platforms, all prices in INR
+// ═══════════════════════════════════════════════════════════
+const PLATFORMS = [
+  // id, name, priceINR (0=hourly), hourlyINR, type(onetime/hourly),
+  // maxModelB, tok7b, tok70b, power, cooling, maxUsers,
+  // cuda, deploy(onprem/cloud/both), sovereignty(full/india/varies)
+  // bestFor[], notFor[], pros[], cons[], tags[]
+  {
+    id:'rpi5', name:'Raspberry Pi 5 + AI Kit',
+    priceINR:7200, hourlyINR:0, type:'onetime',
+    maxModelB:3, tok7b:8, tok70b:0, power:'12W', cooling:'Heatsink · fanless', maxUsers:1,
+    cuda:false, deploy:'onprem', sovereignty:'full',
+    bestFor:['education','edge'], notFor:['inference','finetune','rag','agent','multimodal','research'],
+    pros:['₹7,200 only','12W — runs on battery','Full on-prem privacy'],
+    cons:['1-3B only','No CUDA','Demo/prototype only'],
+    tags:['education','prototype','ultra-low-power']
+  },
+  {
+    id:'jetson_nano', name:'Jetson Orin Nano Super 8GB',
+    priceINR:21600, hourlyINR:0, type:'onetime',
+    maxModelB:8, tok7b:30, tok70b:0, power:'7-25W', cooling:'Heatsink · passive opt', maxUsers:3,
+    cuda:true, deploy:'onprem', sovereignty:'full',
+    bestFor:['edge','education','inference'], notFor:['finetune','multimodal'],
+    pros:['₹21,600 only','67 TOPS CUDA','Full Ollama/vLLM support','7-25W configurable'],
+    cons:['8B max practical','Limited context','Edge form factor'],
+    tags:['edge','budget-cuda','67-TOPS','JetPack']
+  },
+  {
+    id:'mac_mini_16', name:'Mac Mini M4 (16 GB)',
+    priceINR:57900, hourlyINR:0, type:'onetime',
+    maxModelB:7, tok7b:55, tok70b:0, power:'35W', cooling:'Silent · micro-fan', maxUsers:1,
+    cuda:false, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','education','research'], notFor:['finetune','edge'],
+    pros:['₹57,900 one-time','35W ultra-efficient','Completely silent'],
+    cons:['7B only','No CUDA','1 user max'],
+    tags:['personal','silent','apple-silicon']
+  },
+  {
+    id:'mac_mini_64', name:'Mac Mini M4 Pro (64 GB)',
+    priceINR:169900, hourlyINR:0, type:'onetime',
+    maxModelB:30, tok7b:95, tok70b:6, power:'55W', cooling:'Single fan · very quiet', maxUsers:3,
+    cuda:false, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','rag','research','agent'], notFor:['finetune','edge'],
+    pros:['30B at INT4','2-3 users','55W only','~1.7 tok/W'],
+    cons:['No CUDA','No production multi-user'],
+    tags:['dev-workstation','30B','apple-silicon']
+  },
+  {
+    id:'strix_halo', name:'AMD Strix Halo Mini PCs\n(Beelink GTR9 / GMKtec EVO-X2 / Minisforum MS-S1)',
+    priceINR:175000, hourlyINR:0, type:'onetime',
+    maxModelB:70, tok7b:100, tok70b:13, power:'65-160W', cooling:'Dual fan · quiet', maxUsers:4,
+    cuda:false, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','rag','research','agent'], notFor:['edge'],
+    pros:['128GB unified RAM','~₹1.5-2.0L','Windows + Linux','300 GB/s bandwidth','MS-S1 has dual 10GbE + PCIe slot'],
+    cons:['No CUDA (ROCm only)','TensorRT/NIM incompatible'],
+    tags:['AMD','strix-halo','128GB','ROCm','Vulkan','rack-ready']
+  },
+  {
+    id:'mac_studio', name:'Mac Studio M4 Max (128 GB)',
+    priceINR:419000, hourlyINR:0, type:'onetime',
+    maxModelB:70, tok7b:180, tok70b:28, power:'100W', cooling:'Dual fan · near-silent', maxUsers:5,
+    cuda:false, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','rag','multimodal','research'], notFor:['edge','finetune'],
+    pros:['70B at INT4','546 GB/s bandwidth','Near-silent','3-5 users'],
+    cons:['No CUDA','₹4.2L cost'],
+    tags:['power-workstation','70B','546GBs','apple-silicon']
+  },
+  {
+    id:'jetson_thor', name:'NVIDIA Jetson AGX Thor (128 GB)',
+    priceINR:216250, hourlyINR:0, type:'onetime',
+    maxModelB:70, tok7b:160, tok70b:18, power:'40-130W', cooling:'Compact active · low noise', maxUsers:16,
+    cuda:true, deploy:'onprem', sovereignty:'full',
+    bestFor:['edge','inference','multimodal'], notFor:['finetune'],
+    pros:['Edge AI champion','40-130W configurable','Full CUDA + vLLM','8-16 concurrent small models'],
+    cons:['Not for DC scale','Embedded form factor'],
+    tags:['edge-AI','robotics','kiosk','Blackwell','CUDA']
+  },
+  {
+    id:'hp_zgx', name:'HP ZGX Nano G1n (GB10)',
+    priceINR:259500, hourlyINR:0, type:'onetime',
+    maxModelB:200, tok7b:215, tok70b:36, power:'170W', cooling:'Dual fan · quiet', maxUsers:8,
+    cuda:true, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','rag','agent','research','finetune'], notFor:['edge','education'],
+    pros:['ZGX Toolkit software stack','Can be network AI node','200B FP4','ConnectX-7','DGX OS'],
+    cons:['₹2.6L','170W load','ARM only — no x86'],
+    tags:['GB10','CUDA','Blackwell','ZGX-Toolkit','network-node']
+  },
+  {
+    id:'msi_edge', name:'MSI EdgeXpert MS-C931 (GB10)',
+    priceINR:259500, hourlyINR:0, type:'onetime',
+    maxModelB:200, tok7b:215, tok70b:36, power:'170W', cooling:'Active fan', maxUsers:8,
+    cuda:true, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','rag','agent','research','finetune'], notFor:['edge','education'],
+    pros:['Cheapest GB10 device','200B FP4','Industrial focus','DGX OS'],
+    cons:['₹2.6L','170W load'],
+    tags:['GB10','CUDA','Blackwell','cheapest-GB10','industrial']
+  },
+  {
+    id:'asus_gx10', name:'ASUS Ascent GX10 (GB10)',
+    priceINR:302500, hourlyINR:0, type:'onetime',
+    maxModelB:200, tok7b:215, tok70b:36, power:'170W', cooling:'Twin 140mm fans · 7-level control', maxUsers:8,
+    cuda:true, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','rag','agent','research','finetune'], notFor:['edge','education'],
+    pros:['Best thermal design','Twin 140mm fans','200B FP4','1.6x more cooling efficiency'],
+    cons:['₹3.0L','170W load'],
+    tags:['GB10','CUDA','Blackwell','best-cooling']
+  },
+  {
+    id:'dell_gb10', name:'Dell Pro Max GB10',
+    priceINR:346000, hourlyINR:0, type:'onetime',
+    maxModelB:200, tok7b:215, tok70b:36, power:'280W PSU', cooling:'Front-to-back · quieter', maxUsers:8,
+    cuda:true, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','rag','agent','research','finetune'], notFor:['edge','education'],
+    pros:['280W PSU headroom','Better thermals than DGX Spark','Dell enterprise warranty','Front-to-back airflow'],
+    cons:['₹3.5L+','ARM only'],
+    tags:['GB10','CUDA','Blackwell','enterprise','Dell']
+  },
+  {
+    id:'dgx_spark', name:'NVIDIA DGX Spark (GB10)',
+    priceINR:406454, hourlyINR:0, type:'onetime',
+    maxModelB:200, tok7b:220, tok70b:38, power:'170W', cooling:'Active fan · moderate', maxUsers:8,
+    cuda:true, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','rag','agent','research','finetune'], notFor:['edge','education'],
+    pros:['Reference GB10 standard','200B FP4','Pays off vs Azure in <30 days','Dynamo 1.0 ready','DGX OS'],
+    cons:['₹4.1L','170W','Moderate fan noise'],
+    tags:['GB10','CUDA','Blackwell','FP4','Dynamo-1.0']
+  },
+  {
+    id:'taalas', name:'TAALAS 10× RTX 4090',
+    priceINR:4050000, hourlyINR:0, type:'onetime',
+    maxModelB:130, tok7b:600, tok70b:65, power:'3000W', cooling:'Needs active/liquid · loud', maxUsers:25,
+    cuda:true, deploy:'onprem', sovereignty:'full',
+    bestFor:['inference','finetune','rag','agent'], notFor:['edge','education'],
+    pros:['15-25 concurrent users','240GB VRAM total','65 tok/s 70B INT4','Pays off vs cloud 9-12 months'],
+    cons:['₹38-43L upfront','3kW power — needs UPS','Loud','Complex setup'],
+    tags:['production','multi-user','CUDA','240GB','RTX4090']
+  },
+  // ── Cloud ──
+  {
+    id:'yotta', name:'Yotta Shakti Cloud 🇮🇳',
+    priceINR:0, hourlyINR:200, type:'hourly',
+    maxModelB:999, tok7b:1000, tok70b:105, power:'DC', cooling:'DC managed', maxUsers:999,
+    cuda:true, deploy:'cloud', sovereignty:'india',
+    bestFor:['inference','finetune','rag','research','agent','multimodal'],
+    notFor:['edge'],
+    pros:['100% India sovereign','IndiaAI subsidy ₹115/hr','32,768 GPUs','NVIDIA NCP partner'],
+    cons:['Subsidy limited to eligible entities'],
+    tags:['sovereign','NVIDIA-NCP','IndiaAI','Sarvam-AI','H100','GH200']
+  },
+  {
+    id:'e2e', name:'E2E Networks 🇮🇳',
+    priceINR:0, hourlyINR:200, type:'hourly',
+    maxModelB:999, tok7b:1000, tok70b:105, power:'DC', cooling:'DC managed', maxUsers:999,
+    cuda:true, deploy:'cloud', sovereignty:'india',
+    bestFor:['inference','rag','research','finetune'],
+    notFor:['edge'],
+    pros:['100% India sovereign','Billed per minute','NSE-listed','Hosts AI4Bharat','IndiaAI empanelled'],
+    cons:['Smaller fleet than Yotta'],
+    tags:['sovereign','NSE-listed','IndiaAI','per-minute','H100']
+  },
+  {
+    id:'oracle', name:'Oracle Cloud (Bare Metal)',
+    priceINR:0, hourlyINR:108, type:'hourly',
+    maxModelB:999, tok7b:1000, tok70b:105, power:'DC', cooling:'DC managed', maxUsers:999,
+    cuda:true, deploy:'cloud', sovereignty:'varies',
+    bestFor:['finetune','research','inference'],
+    notFor:['edge'],
+    pros:['Cheapest hyperscaler ₹108/hr/GPU','Bare-metal performance','Hyderabad DC','5.2-month DGX Spark break-even'],
+    cons:['Fewer managed AI services','US-controlled'],
+    tags:['cheapest-hyperscaler','bare-metal','H100','Hyderabad']
+  },
+  {
+    id:'gcp', name:'Google Cloud A3-High',
+    priceINR:0, hourlyINR:260, type:'hourly',
+    maxModelB:999, tok7b:1000, tok70b:105, power:'DC', cooling:'DC managed', maxUsers:999,
+    cuda:true, deploy:'cloud', sovereignty:'varies',
+    bestFor:['finetune','research','inference','multimodal'],
+    notFor:['edge'],
+    pros:['Best value hyperscaler','Mumbai DC','Vertex AI','TPU alternative','Sustained-use discounts'],
+    cons:['US-controlled','2.2-month break-even vs DGX Spark'],
+    tags:['hyperscaler','H100','Mumbai','Vertex-AI','TPU']
+  },
+  {
+    id:'runpod', name:'RunPod (H100)',
+    priceINR:0, hourlyINR:172, type:'hourly',
+    maxModelB:999, tok7b:1000, tok70b:105, power:'DC', cooling:'DC managed', maxUsers:999,
+    cuda:true, deploy:'cloud', sovereignty:'varies',
+    bestFor:['research','finetune','inference'],
+    notFor:['edge'],
+    pros:['Budget ₹172/hr','Easy setup','Spot + on-demand'],
+    cons:['No India DC','Not for strict sovereignty','Spot interruptions'],
+    tags:['budget-cloud','H100','dev-friendly']
+  },
+];
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// Optimisations library
+const OPTS = [
+  {icon:'⚡',name:'INT4 / Q4 Quantization',gain:'4-8× less VRAM · 2-3× faster',desc:'Shrinks 70B from 140GB → 35GB VRAM. Most practical first step. Use GPTQ, AWQ, or llama.cpp.',triggers:['70b','30b','120b']},
+  {icon:'🧠',name:'KV Cache + Dynamo 1.0',gain:'Up to 7× throughput — free',desc:'NVIDIA Dynamo 1.0 (open-source, March 2026) routes requests to GPUs holding context. Deploy today on any Blackwell GPU.',triggers:['multi-user','agent','rag','cloud']},
+  {icon:'📦',name:'Continuous Batching (vLLM)',gain:'3-10× GPU utilisation',desc:'Process requests as they arrive. Turns 15% GPU → 80%+. Essential for production multi-user setups.',triggers:['multi-user','production']},
+  {icon:'📚',name:'Context Optimisation + RAG',gain:'2-16× less compute',desc:'Inference is O(n²). Replace long context with RAG retrieval. Cutting 32K→8K = 16× less attention compute.',triggers:['rag','agent']},
+  {icon:'🇮🇳',name:'IndiaAI Mission Subsidy',gain:'₹115/hr (40-100% off)',desc:'Eligible Indian startups get H100/GH200 at ₹115-150/hr vs ₹250-400 full rate. Apply at indiaai.gov.in.',triggers:['india','sovereign']},
+  {icon:'🔬',name:'Microsoft BitNet b1.58',gain:'32× less memory · 82% less energy',desc:'1-bit ternary weights. 2B model = 0.4GB. Runs 100B on single CPU at 5-7 tok/s. Free via bitnet.cpp.',triggers:['edge','small-model']},
+  {icon:'🧬',name:'Model Distillation + LoRA',gain:'5-15× smaller model',desc:'DeepSeek R1 distilled to 1.5B-7B retains 90%+ reasoning on specific tasks. Great for task-specific APIs.',triggers:['finetune','cost']},
+  {icon:'🚀',name:'Speculative Decoding',gain:'2-4× decode speed · zero quality loss',desc:'Small draft model proposes, large model verifies in parallel. Supported on DGX Spark, TAALAS, Jetson Thor.',triggers:['production','latency']},
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let sessionId = null, authProvider = null, offlineMode = false;
+let codexFlowId = null, codexPoll = null;
+let geminiFlowId = null, geminiPoll = null;
+let qwenFlowId = null, qwenPoll = null;
+const PROVIDER_META = {
+  anthropic: {
+    keyLabel: 'Anthropic API key',
+    placeholder: 'sk-ant-api03-...',
+    authLabel: 'Anthropic Claude',
+    resultLabel: 'Claude Sonnet 4.6',
+  },
+  'anthropic-setup-token': {
+    keyLabel: 'Claude setup-token',
+    placeholder: 'sk-ant-st01-...',
+    authLabel: 'Claude setup-token',
+    resultLabel: 'Claude Sonnet 4.6',
+  },
+  openai: {
+    keyLabel: 'OpenAI API key',
+    placeholder: 'sk-...',
+    authLabel: 'OpenAI API Key',
+    resultLabel: 'GPT-4o',
+  },
+  google: {
+    keyLabel: 'Gemini API key',
+    placeholder: 'AIza... or Gemini API key',
+    authLabel: 'Google Gemini API Key',
+    resultLabel: 'Gemini 2.5 Pro',
+  },
+  'google-oauth': {
+    keyLabel: 'Gemini OAuth',
+    placeholder: '',
+    authLabel: 'Gemini OAuth',
+    resultLabel: 'Gemini 2.5 Pro',
+  },
+  mistral: {
+    keyLabel: 'Mistral API key',
+    placeholder: 'Paste Mistral API key',
+    authLabel: 'Mistral API Key',
+    resultLabel: 'Mistral Large',
+  },
+  qwen: {
+    keyLabel: 'Qwen portal token / API key',
+    placeholder: 'Paste Qwen portal token or API key',
+    authLabel: 'Qwen Portal Token',
+    resultLabel: 'Qwen Coder',
+  },
+  'qwen-oauth': {
+    keyLabel: 'Qwen OAuth',
+    placeholder: '',
+    authLabel: 'Qwen OAuth',
+    resultLabel: 'Qwen Coder',
+  },
+  kimi: {
+    keyLabel: 'Kimi API key',
+    placeholder: 'Paste Kimi API key',
+    authLabel: 'Kimi API Key',
+    resultLabel: 'Kimi Code',
+  },
+  groq: {
+    keyLabel: 'Groq API key',
+    placeholder: 'gsk_... or Groq API key',
+    authLabel: 'Groq API Key',
+    resultLabel: 'Groq LLM',
+  },
+  deepseek: {
+    keyLabel: 'DeepSeek API key',
+    placeholder: 'sk-... or DeepSeek API key',
+    authLabel: 'DeepSeek API Key',
+    resultLabel: 'DeepSeek Chat',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
 window.addEventListener('load', () => {
-  // Check for OAuth callback redirect
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('authed') === '1') {
-    sessionId    = params.get('session');
-    authProvider = params.get('provider');
-    window.history.replaceState({}, '', '/');
-    onAuthSuccess();
-    return;
-  }
+  // Restore session
+  try {
+    const s = JSON.parse(sessionStorage.getItem('advisorSession') || 'null');
+    if (s?.sessionId) { sessionId = s.sessionId; authProvider = s.provider; offlineMode = s.offline; onAuthSuccess(true); return; }
+  } catch {}
 
-  // Restore session from sessionStorage
-  const stored = sessionStorage.getItem('advisorSession');
-  if (stored) {
-    try {
-      const s = JSON.parse(stored);
-      if (s.sessionId) { sessionId = s.sessionId; authProvider = s.provider; onAuthSuccess(true); return; }
-    } catch {}
-  }
+  wireFormListeners();
+  updateByokUi();
+});
 
-  // Wire up form listeners
-  document.querySelectorAll('input[name="usage"]').forEach(r => {
+function wireFormListeners() {
+  document.querySelectorAll('input[name="usage"]').forEach(r =>
     r.addEventListener('change', () => {
       document.getElementById('hoursField').style.display = r.value === 'daily' ? 'block' : 'none';
-    });
-  });
-  document.querySelectorAll('input[name="budgetType"]').forEach(r => {
+    })
+  );
+  document.querySelectorAll('input[name="budgetType"]').forEach(r =>
     r.addEventListener('change', () => {
       document.getElementById('budgetInput').style.display = r.value !== 'none' ? 'block' : 'none';
       document.getElementById('budgetHint').textContent = r.value === 'capex' ? 'one-time CapEx' : '/ month';
-    });
-  });
-});
-
-// ── Provider selection ────────────────────────────────────────────────────────
-function selectProvider(p) {
-  document.getElementById('claudeBtn').classList.toggle('selected', p === 'claude');
-  document.getElementById('chatgptBtn').classList.toggle('selected', p === 'chatgpt');
-  document.getElementById('claudeFlow').style.display  = p === 'claude'  ? 'block' : 'none';
-  document.getElementById('chatgptFlow').style.display = p === 'chatgpt' ? 'block' : 'none';
+    })
+  );
+  document.querySelectorAll('input[name="byokProvider"]').forEach(r =>
+    r.addEventListener('change', updateByokUi)
+  );
+  document.querySelectorAll('input[name="anthropicAuthMode"]').forEach(r =>
+    r.addEventListener('change', updateByokUi)
+  );
 }
 
-function resetProviderSelect() {
-  document.getElementById('claudeBtn').classList.remove('selected');
-  document.getElementById('chatgptBtn').classList.remove('selected');
-  document.getElementById('claudeFlow').style.display  = 'none';
-  document.getElementById('chatgptFlow').style.display = 'none';
-  document.getElementById('chatgptWaiting').style.display = 'none';
-  clearInterval(pollInterval);
-  setStatus('', '');
+function getSelectedByokProvider() {
+  return document.querySelector('input[name="byokProvider"]:checked')?.value || 'anthropic';
 }
 
-function copyCmd() {
-  navigator.clipboard.writeText('claude setup-token').then(() => {
-    setStatus('authed', 'Command copied to clipboard');
-    setTimeout(() => setStatus('', ''), 2000);
-  });
+function getSelectedAnthropicAuthMode() {
+  return document.querySelector('input[name="anthropicAuthMode"]:checked')?.value || 'api-key';
 }
 
-// ── Claude: setup-token paste flow ────────────────────────────────────────────
-async function submitSetupToken() {
-  const token = document.getElementById('setupToken').value.trim();
-  if (!token) return setStatus('error', 'Please paste your setup token');
+function getAuthProviderMeta(provider) {
+  if (provider === 'openai-codex-oauth') {
+    return { authLabel: 'ChatGPT OAuth', resultLabel: 'ChatGPT Codex' };
+  }
+  if (provider === 'google-oauth') {
+    return PROVIDER_META['google-oauth'];
+  }
+  if (provider === 'qwen-oauth') {
+    return PROVIDER_META['qwen-oauth'];
+  }
+  if (provider === 'anthropic-setup-token') {
+    return PROVIDER_META['anthropic-setup-token'];
+  }
+  const normalized = provider?.replace(/-byok$/, '') || '';
+  return PROVIDER_META[normalized] || { authLabel: normalized || 'AI provider', resultLabel: 'AI model' };
+}
 
-  const btn = document.getElementById('tokenSubmitBtn');
-  btn.disabled = true; btn.textContent = 'Validating...';
-  setStatus('pending', 'Validating token with Anthropic...');
+function updateByokUi() {
+  const provider = getSelectedByokProvider();
+  const isAnthropic = provider === 'anthropic';
+  const anthropicAuthMode = getSelectedAnthropicAuthMode();
+  const meta = getAuthProviderMeta(
+    isAnthropic && anthropicAuthMode === 'setup-token' ? 'anthropic-setup-token' : provider
+  );
+  document.getElementById('anthropicAuthModes').style.display = isAnthropic ? 'flex' : 'none';
+  document.getElementById('byokKey').placeholder = meta.placeholder || 'Paste API key';
+  document.getElementById('byokHelp').textContent = `${meta.keyLabel || 'API key'} stored in memory only — never written to disk or logged.`;
+}
 
-  try {
-    // Get a sessionId first
-    const startRes = await fetch('/auth/start', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider: 'claude' }),
-    });
-    const startData = await startRes.json();
-    sessionId = startData.sessionId;
-
-    // Submit the token
-    const res = await fetch('/auth/token', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, token }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Token validation failed');
-
-    authProvider = 'claude';
-    onAuthSuccess();
-  } catch (e) {
-    setStatus('error', e.message);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Connect';
+// ═══════════════════════════════════════════════════════════
+// AUTH FLOWS
+// ═══════════════════════════════════════════════════════════
+function stopOpenAICodexPolling() {
+  if (codexPoll) {
+    clearInterval(codexPoll);
+    codexPoll = null;
   }
 }
 
-// ── ChatGPT: OAuth browser flow ───────────────────────────────────────────────
-async function startChatGPTOAuth() {
-  setStatus('pending', 'Starting OAuth...');
-
-  let startData;
-  try {
-    const res = await fetch('/auth/start', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider: 'chatgpt' }),
-    });
-    startData = await res.json();
-    if (!res.ok) throw new Error(startData.error);
-  } catch (e) {
-    return setStatus('error', `Could not start: ${e.message}`);
+function stopGeminiPolling() {
+  if (geminiPoll) {
+    clearInterval(geminiPoll);
+    geminiPoll = null;
   }
+}
 
-  sessionId = startData.sessionId;
-  authProvider = 'chatgpt';
+function stopQwenPolling() {
+  if (qwenPoll) {
+    clearInterval(qwenPoll);
+    qwenPoll = null;
+  }
+}
 
-  window.open(startData.authUrl, '_blank');
-  document.getElementById('chatgptWaiting').style.display = 'block';
-  setStatus('pending', 'Complete sign-in in the browser tab...');
+function setCodexOAuthLink(url) {
+  const link = document.getElementById('codexOAuthLink');
+  if (!url) {
+    link.style.display = 'none';
+    link.textContent = '';
+    link.removeAttribute('href');
+    return;
+  }
+  link.href = url;
+  link.textContent = url;
+  link.style.display = 'block';
+}
 
-  // Poll for token
-  let attempts = 0;
-  pollInterval = setInterval(async () => {
-    if (++attempts > 120) {
-      clearInterval(pollInterval);
-      document.getElementById('chatgptWaiting').style.display = 'none';
-      return setStatus('error', 'Timed out. Please try again.');
+function setOauthLink(id, url) {
+  const link = document.getElementById(id);
+  if (!url) {
+    link.style.display = 'none';
+    link.textContent = '';
+    link.removeAttribute('href');
+    return;
+  }
+  link.href = url;
+  link.textContent = url;
+  link.style.display = 'block';
+}
+
+async function pollOpenAICodexStatus() {
+  if (!codexFlowId) return;
+  try {
+    const r = await fetch('/api/openai-codex/status', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ flowId: codexFlowId }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'OAuth status check failed');
+    if (d.authUrl) setCodexOAuthLink(d.authUrl);
+    if (d.status === 'complete' && d.sessionId) {
+      stopOpenAICodexPolling();
+      document.getElementById('codexOAuthWait').style.display = 'none';
+      document.getElementById('codexManualCode').value = '';
+      sessionId = d.sessionId;
+      authProvider = 'openai-codex-oauth';
+      codexFlowId = null;
+      onAuthSuccess();
+      return;
     }
-    try {
-      const r = await fetch('/auth/status', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
-      });
-      const s = await r.json();
-      if (s.authed) {
-        clearInterval(pollInterval);
-        document.getElementById('chatgptWaiting').style.display = 'none';
-        onAuthSuccess();
-      }
-    } catch {}
-  }, 1000);
+    if (d.status === 'error') {
+      stopOpenAICodexPolling();
+      document.getElementById('codexOAuthWait').style.display = 'none';
+      setStatus('error', d.error || 'ChatGPT OAuth failed');
+      codexFlowId = null;
+    }
+  } catch (e) {
+    stopOpenAICodexPolling();
+    document.getElementById('codexOAuthWait').style.display = 'none';
+    setStatus('error', e.message);
+    codexFlowId = null;
+  }
 }
 
-function cancelChatGPTOAuth() {
-  clearInterval(pollInterval);
-  document.getElementById('chatgptWaiting').style.display = 'none';
-  setStatus('', '');
-}
-
-// ── BYOK ──────────────────────────────────────────────────────────────────────
-async function useBYOK() {
-  const key      = document.getElementById('byokKey').value.trim();
-  const provider = document.querySelector('input[name="byokProvider"]:checked').value;
-  if (!key) return setStatus('error', 'Please enter an API key');
+async function useOpenAICodexOAuth() {
+  stopGeminiPolling();
+  stopQwenPolling();
+  stopOpenAICodexPolling();
+  setStatus('pending', 'Opening ChatGPT sign-in');
+  document.getElementById('codexOAuthWait').style.display = 'block';
+  document.getElementById('codexManualCode').value = '';
+  setCodexOAuthLink('');
 
   try {
-    const res = await fetch('/api/byok', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider, apiKey: key }),
+    const r = await fetch('/api/openai-codex/start', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:'{}',
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    sessionId    = data.sessionId;
-    authProvider = provider + '-byok';
-    onAuthSuccess();
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Failed to start ChatGPT OAuth');
+    codexFlowId = d.flowId;
+    if (d.authUrl) setCodexOAuthLink(d.authUrl);
+    codexPoll = setInterval(pollOpenAICodexStatus, 1000);
+    void pollOpenAICodexStatus();
+  } catch (e) {
+    document.getElementById('codexOAuthWait').style.display = 'none';
+    setStatus('error', e.message);
+  }
+}
+
+async function pollGeminiOAuthStatus() {
+  if (!geminiFlowId) return;
+  try {
+    const r = await fetch('/api/gemini/status', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ flowId: geminiFlowId }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Gemini OAuth status check failed');
+    if (d.authUrl) setOauthLink('geminiOAuthLink', d.authUrl);
+    if (d.instructions) document.getElementById('geminiOAuthInstructions').textContent = d.instructions;
+    if (d.status === 'complete' && d.sessionId) {
+      stopGeminiPolling();
+      document.getElementById('geminiOAuthWait').style.display = 'none';
+      document.getElementById('geminiManualCode').value = '';
+      sessionId = d.sessionId;
+      authProvider = 'google-oauth';
+      geminiFlowId = null;
+      onAuthSuccess();
+      return;
+    }
+    if (d.status === 'error') {
+      stopGeminiPolling();
+      document.getElementById('geminiOAuthWait').style.display = 'none';
+      setStatus('error', d.error || 'Gemini OAuth failed');
+      geminiFlowId = null;
+    }
+  } catch (e) {
+    stopGeminiPolling();
+    document.getElementById('geminiOAuthWait').style.display = 'none';
+    setStatus('error', e.message);
+    geminiFlowId = null;
+  }
+}
+
+async function useGeminiOAuth() {
+  stopOpenAICodexPolling();
+  stopGeminiPolling();
+  stopQwenPolling();
+  setStatus('pending', 'Opening Gemini sign-in');
+  document.getElementById('geminiOAuthWait').style.display = 'block';
+  document.getElementById('geminiManualCode').value = '';
+  document.getElementById('geminiOAuthInstructions').textContent = 'If the browser did not open, use the link below or paste the full redirect URL manually.';
+  setOauthLink('geminiOAuthLink', '');
+
+  try {
+    const r = await fetch('/api/gemini/start', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:'{}',
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Failed to start Gemini OAuth');
+    geminiFlowId = d.flowId;
+    if (d.authUrl) setOauthLink('geminiOAuthLink', d.authUrl);
+    if (d.instructions) document.getElementById('geminiOAuthInstructions').textContent = d.instructions;
+    geminiPoll = setInterval(pollGeminiOAuthStatus, 1000);
+    void pollGeminiOAuthStatus();
+  } catch (e) {
+    document.getElementById('geminiOAuthWait').style.display = 'none';
+    setStatus('error', e.message);
+  }
+}
+
+async function submitGeminiOAuthCode() {
+  if (!geminiFlowId) return setStatus('error', 'Start Gemini OAuth first');
+  const code = document.getElementById('geminiManualCode').value.trim();
+  if (!code) return setStatus('error', 'Paste the Gemini redirect URL');
+  try {
+    const r = await fetch('/api/gemini/code', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ flowId: geminiFlowId, code }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Failed to submit Gemini redirect URL');
+    setStatus('pending', 'Completing Gemini sign-in');
   } catch (e) {
     setStatus('error', e.message);
   }
 }
 
-// ── Post-auth ─────────────────────────────────────────────────────────────────
-function onAuthSuccess(silent = false) {
-  sessionStorage.setItem('advisorSession', JSON.stringify({ sessionId, provider: authProvider }));
-
-  const labels = {
-    'claude':      '🟣 Claude Pro (setup-token)',
-    'chatgpt':     '🟢 ChatGPT Plus (OAuth)',
-    'claude-byok': '🔑 Claude (API Key)',
-    'openai-byok': '🔑 OpenAI (API Key)',
-  };
-  document.getElementById('providerLabel').textContent = labels[authProvider] || authProvider;
-
-  if (!silent) setStatus('authed', 'Connected successfully');
-  setTimeout(() => {
-    document.getElementById('authScreen').style.display   = 'none';
-    document.getElementById('advisorScreen').style.display = 'block';
-    document.getElementById('resultScreen').style.display  = 'none';
-  }, silent ? 0 : 500);
+async function pollQwenOAuthStatus() {
+  if (!qwenFlowId) return;
+  try {
+    const r = await fetch('/api/qwen/status', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ flowId: qwenFlowId }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Qwen OAuth status check failed');
+    if (d.authUrl) setOauthLink('qwenOAuthLink', d.authUrl);
+    if (d.userCode) document.getElementById('qwenUserCode').textContent = d.userCode;
+    if (d.status === 'complete' && d.sessionId) {
+      stopQwenPolling();
+      document.getElementById('qwenOAuthWait').style.display = 'none';
+      sessionId = d.sessionId;
+      authProvider = 'qwen-oauth';
+      qwenFlowId = null;
+      onAuthSuccess();
+      return;
+    }
+    if (d.status === 'error') {
+      stopQwenPolling();
+      document.getElementById('qwenOAuthWait').style.display = 'none';
+      setStatus('error', d.error || 'Qwen OAuth failed');
+      qwenFlowId = null;
+    }
+  } catch (e) {
+    stopQwenPolling();
+    document.getElementById('qwenOAuthWait').style.display = 'none';
+    setStatus('error', e.message);
+    qwenFlowId = null;
+  }
 }
 
+async function useQwenOAuth() {
+  stopOpenAICodexPolling();
+  stopGeminiPolling();
+  stopQwenPolling();
+  setStatus('pending', 'Starting Qwen device sign-in');
+  document.getElementById('qwenOAuthWait').style.display = 'block';
+  document.getElementById('qwenUserCode').textContent = '';
+  setOauthLink('qwenOAuthLink', '');
+
+  try {
+    const r = await fetch('/api/qwen/start', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:'{}',
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Failed to start Qwen OAuth');
+    qwenFlowId = d.flowId;
+    if (d.authUrl) setOauthLink('qwenOAuthLink', d.authUrl);
+    if (d.userCode) document.getElementById('qwenUserCode').textContent = d.userCode;
+    qwenPoll = setInterval(pollQwenOAuthStatus, 1500);
+    void pollQwenOAuthStatus();
+  } catch (e) {
+    document.getElementById('qwenOAuthWait').style.display = 'none';
+    setStatus('error', e.message);
+  }
+}
+
+async function submitOpenAICodexCode() {
+  if (!codexFlowId) return setStatus('error', 'Start ChatGPT OAuth first');
+  const code = document.getElementById('codexManualCode').value.trim();
+  if (!code) return setStatus('error', 'Paste the redirect URL or authorization code');
+  try {
+    const r = await fetch('/api/openai-codex/code', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ flowId: codexFlowId, code }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Failed to submit code');
+    setStatus('pending', 'Completing ChatGPT sign-in');
+  } catch (e) {
+    setStatus('error', e.message);
+  }
+}
+
+async function useBYOK() {
+  const key = document.getElementById('byokKey').value.trim();
+  const provider = getSelectedByokProvider();
+  const authMode = provider === 'anthropic' ? getSelectedAnthropicAuthMode() : 'api-key';
+  if (!key) return setStatus('error', 'Enter an API key');
+  try {
+    const r = await fetch('/api/byok', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({provider, authMode, apiKey:key}) });
+    const d = await r.json(); if (!r.ok) throw new Error(d.error);
+    sessionId = d.sessionId;
+    authProvider = provider === 'anthropic' && authMode === 'setup-token'
+      ? 'anthropic-setup-token'
+      : provider + '-byok';
+    onAuthSuccess();
+  } catch(e) { setStatus('error', e.message); }
+}
+
+// ── OFFLINE MODE ──────────────────────────────────────────
+function useOfflineMode() {
+  stopOpenAICodexPolling();
+  stopGeminiPolling();
+  stopQwenPolling();
+  codexFlowId = null;
+  geminiFlowId = null;
+  qwenFlowId = null;
+  offlineMode = true; sessionId = null; authProvider = 'offline';
+  sessionStorage.setItem('advisorSession', JSON.stringify({offline:true, provider:'offline', sessionId:'offline'}));
+  showAdvisorScreen();
+}
+
+function onAuthSuccess(silent = false) {
+  sessionStorage.setItem('advisorSession', JSON.stringify({sessionId, provider:authProvider, offline:false}));
+  if (!silent) setStatus('authed', 'Connected');
+  setTimeout(() => showAdvisorScreen(), silent ? 0 : 400);
+}
+function showAdvisorScreen() {
+  wireFormListeners();
+  const isOff = offlineMode || authProvider === 'offline';
+  const bar = document.getElementById('providerBar');
+  const dot = document.getElementById('providerDot');
+  const lbl = document.getElementById('providerLabel');
+  if (isOff) {
+    bar.className = 'provider-bar offline-bar';
+    dot.style.background = 'var(--purple)';
+    lbl.innerHTML = '<span style="color:var(--purple)">⚡ Dataset mode</span> <span style="color:var(--muted);font-size:12px">— instant recommendations, no AI</span>';
+  } else {
+    bar.className = 'provider-bar ai-bar';
+    dot.style.background = 'var(--green)';
+    const meta = getAuthProviderMeta(authProvider);
+    const prefix = authProvider === 'openai-codex-oauth' ? '🟢 ' : '🔑 ';
+    lbl.innerHTML = `<span>${prefix}${meta.authLabel}</span> <span style="color:var(--muted);font-size:12px">— AI-powered recommendations</span>`;
+  }
+  document.getElementById('authScreen').style.display    = 'none';
+  document.getElementById('advisorScreen').style.display = 'block';
+  document.getElementById('resultScreen').style.display  = 'none';
+}
 function switchProvider() {
+  stopOpenAICodexPolling();
+  stopGeminiPolling();
+  stopQwenPolling();
+  codexFlowId = null;
+  geminiFlowId = null;
+  qwenFlowId = null;
   sessionStorage.removeItem('advisorSession');
-  sessionId = null; authProvider = null;
-  resetProviderSelect();
+  sessionId = null; authProvider = null; offlineMode = false;
+  document.getElementById('codexOAuthWait').style.display = 'none';
+  document.getElementById('codexManualCode').value = '';
+  document.getElementById('geminiOAuthWait').style.display = 'none';
+  document.getElementById('geminiManualCode').value = '';
+  document.getElementById('qwenOAuthWait').style.display = 'none';
+  document.getElementById('qwenUserCode').textContent = '';
+  setCodexOAuthLink('');
+  setOauthLink('geminiOAuthLink', '');
+  setOauthLink('qwenOAuthLink', '');
   document.getElementById('authScreen').style.display    = 'block';
   document.getElementById('advisorScreen').style.display = 'none';
   document.getElementById('resultScreen').style.display  = 'none';
   setStatus('', '');
 }
-
 function setStatus(type, msg) {
   const el = document.getElementById('authStatus');
-  if (!type) { el.innerHTML = ''; return; }
-  el.innerHTML = `<span class="status-pill ${type} dot">${msg}</span>`;
+  el.innerHTML = (type && msg) ? `<span class="status-pill ${type} dot">${msg}</span>` : '';
 }
 
-// ── Get recommendation ────────────────────────────────────────────────────────
-async function getRecommendation() {
-  const usage      = document.querySelector('input[name="usage"]:checked')?.value;
-  const users      = document.querySelector('input[name="users"]:checked')?.value;
-  const projectType = document.querySelector('input[name="projectType"]:checked')?.value;
-  const modelSize  = document.querySelector('input[name="modelSize"]:checked')?.value;
-  const sovereignty = document.querySelector('input[name="sovereignty"]:checked')?.value;
-  const cuda       = document.querySelector('input[name="cuda"]:checked')?.value;
-  const deploy     = document.querySelector('input[name="deploy"]:checked')?.value;
-  const budgetType = document.querySelector('input[name="budgetType"]:checked')?.value;
-  const budget     = budgetType !== 'none'
-    ? `₹${document.getElementById('budgetAmount').value || 'unspecified'} (${budgetType})`
-    : 'No limit';
-  const hours = document.getElementById('hoursPerDay').value;
+// ═══════════════════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════════════════
+function collectForm() {
+  return {
+    usage:       document.querySelector('input[name="usage"]:checked')?.value || 'daily',
+    hours:       document.getElementById('hoursPerDay').value,
+    users:       parseInt(document.querySelector('input[name="users"]:checked')?.value || '1'),
+    projectType: document.querySelector('input[name="projectType"]:checked')?.value || 'research',
+    modelB:      parseInt(document.querySelector('input[name="modelSize"]:checked')?.value || '7'),
+    sovereignty: document.querySelector('input[name="sovereignty"]:checked')?.value || 'any',
+    cuda:        document.querySelector('input[name="cuda"]:checked')?.value || 'any',
+    deploy:      document.querySelector('input[name="deploy"]:checked')?.value || 'hybrid',
+    budgetType:  document.querySelector('input[name="budgetType"]:checked')?.value || 'none',
+    budget:      parseFloat(document.getElementById('budgetAmount').value) || Infinity,
+  };
+}
 
-  if (!projectType) return alert('Please select a primary use case.');
-
+async function submit() {
+  const form = collectForm();
   document.getElementById('advisorScreen').style.display = 'none';
   document.getElementById('resultScreen').style.display  = 'block';
-  document.getElementById('resultLoading').style.display = 'block';
-  document.getElementById('resultContent').style.display = 'none';
-  document.getElementById('resultContent').innerHTML = '';
 
-  try {
-    const res = await fetch('/api/recommend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId,
-        requirements: { usage, hours, users, projectType, modelSize, sovereignty, cuda, deploy, budget },
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Request failed');
-    renderMarkdown(data.recommendation);
-  } catch (e) {
-    document.getElementById('resultLoading').style.display = 'none';
-    document.getElementById('resultContent').style.display = 'block';
-    document.getElementById('resultContent').innerHTML =
-      `<p style="color:var(--red)">⚠️ ${e.message}</p>
-       <p style="color:var(--muted);font-size:13px;margin-top:8px">
-       Check that your session is still valid. <a href="#" onclick="switchProvider()" style="color:var(--accent)">Sign in again</a></p>`;
+  const isOff = offlineMode || authProvider === 'offline';
+  const meta = getAuthProviderMeta(authProvider);
+
+  document.getElementById('modeFlag').innerHTML = isOff
+    ? '<span class="mode-badge offline">⚡ Dataset Mode — scored from 17-platform database</span>'
+    : '<span class="mode-badge ai">🤖 AI Mode — powered by ' + meta.resultLabel + '</span>';
+
+  document.getElementById('llmLoading').style.display = 'none';
+  document.getElementById('llmResult').style.display  = 'none';
+  document.getElementById('recCards').innerHTML = '';
+  document.getElementById('summaryBox').innerHTML = '';
+
+  if (isOff) {
+    renderOfflineResults(form);
+  } else {
+    renderAIResults(form);
   }
 }
 
@@ -750,40 +1170,229 @@ function goBack() {
   document.getElementById('advisorScreen').style.display = 'block';
 }
 
-// ── Markdown renderer (minimal, no deps) ──────────────────────────────────────
-function renderMarkdown(md) {
-  document.getElementById('resultLoading').style.display = 'none';
-  document.getElementById('resultContent').style.display = 'block';
+// ═══════════════════════════════════════════════════════════
+// OFFLINE SCORING ENGINE
+// ═══════════════════════════════════════════════════════════
+function scorePlatform(p, f) {
+  let s = 100;
+  const { usage, users, projectType, modelB, sovereignty, cuda, deploy, budgetType, budget } = f;
 
-  let html = md
-    // Tables
-    .replace(/\|(.+)\|\n\|[-|: ]+\|\n((?:\|.+\|\n?)+)/g, (_, header, rows) => {
-      const ths = header.split('|').filter(s => s.trim()).map(s => `<th>${s.trim()}</th>`).join('');
-      const trs = rows.trim().split('\n').map(row => {
-        const tds = row.split('|').filter(s => s.trim()).map(s => `<td>${s.trim()}</td>`).join('');
-        return `<tr>${tds}</tr>`;
-      }).join('');
+  // Hard disqualifiers
+  if (p.maxModelB < modelB) return -1;
+  if (sovereignty === 'india' && p.sovereignty !== 'india') return -1;
+  if (cuda === 'yes' && !p.cuda) return -1;
+  if (deploy === 'onprem' && p.deploy !== 'onprem') return -1;
+  if (deploy === 'cloud'  && p.deploy !== 'cloud')  return -1;
+  if (p.maxUsers < users) return -1;
+
+  // Budget
+  const hrs = usage === '247' ? 24 : usage === 'adhoc' ? 2 : parseInt(f.hours) || 8;
+  const monthly = p.type === 'hourly' ? p.hourlyINR * hrs * 30 : 0;
+  const capex   = p.type === 'onetime' ? p.priceINR : 0;
+  if (budgetType === 'monthly' && p.type === 'hourly' && monthly > budget) return -1;
+  if (budgetType === 'capex'   && p.type === 'onetime' && capex > budget)  return -1;
+
+  // Positive scoring
+  if (sovereignty === 'india'  && p.sovereignty === 'india') s += 30;
+  if (sovereignty === 'prefer' && p.sovereignty === 'india') s += 15;
+  if (p.cuda && cuda !== 'no')  s += 8;
+  if (p.maxUsers >= users * 2)  s += 12;
+  if (budgetType === 'monthly' && monthly > 0 && monthly < budget * 0.6) s += 8;
+  if (budgetType === 'capex'   && capex > 0   && capex   < budget * 0.6) s += 8;
+
+  // Usage pattern
+  if (usage === 'adhoc'  && p.type === 'hourly')  s += 20;
+  if (usage === 'adhoc'  && p.type === 'onetime') s -= 12;
+  if (usage === '247'    && p.type === 'onetime') s += 18;
+  if (usage === '247'    && p.type === 'hourly')  { if (monthly > 200000) s -= 10; else s += 6; }
+
+  // Project fit
+  if (p.bestFor.includes(projectType)) s += 25;
+  if (p.notFor.includes(projectType))  s -= 20;
+
+  // Specific boosts
+  if (projectType === 'edge'      && p.id === 'jetson_thor')  s += 30;
+  if (projectType === 'edge'      && p.id === 'jetson_nano')  s += 25;
+  if (projectType === 'education' && p.id === 'rpi5')         s += 30;
+  if (projectType === 'finetune'  && p.cuda)                  s += 12;
+  if (modelB >= 120 && p.maxModelB >= 120) s += 20;
+  if (modelB >= 70  && p.tok70b >= 30)     s += 10;
+
+  // Performance bonus
+  const tokRef = modelB <= 7 ? p.tok7b : p.tok70b;
+  s += Math.min(tokRef / 8, 18);
+
+  return Math.round(s);
+}
+
+function pickOptimisations(f) {
+  const triggers = new Set();
+  if (f.modelB >= 30) triggers.add('70b');
+  if (f.modelB >= 30) triggers.add('30b');
+  if (f.modelB >= 120) triggers.add('120b');
+  if (f.users >= 10) { triggers.add('multi-user'); triggers.add('production'); }
+  if (f.projectType === 'rag') triggers.add('rag');
+  if (f.projectType === 'agent') triggers.add('agent');
+  if (f.projectType === 'edge') { triggers.add('edge'); triggers.add('small-model'); }
+  if (f.projectType === 'finetune') triggers.add('finetune');
+  if (f.sovereignty === 'india' || f.sovereignty === 'prefer') { triggers.add('india'); triggers.add('sovereign'); }
+  if (f.budgetType !== 'none') triggers.add('cost');
+  if (f.usage === '247' || f.users >= 10) triggers.add('latency');
+  if (f.usage === 'adhoc' || f.deploy === 'cloud') triggers.add('cloud');
+  return OPTS.filter(o => o.triggers.some(t => triggers.has(t))).slice(0, 4);
+}
+
+function fmtPrice(p, f) {
+  if (p.type === 'onetime') return `₹${p.priceINR.toLocaleString('en-IN')}`;
+  const hrs = f.usage === '247' ? 24 : f.usage === 'adhoc' ? 2 : parseInt(f.hours) || 8;
+  const mo = p.hourlyINR * hrs * 30;
+  return `₹${p.hourlyINR.toLocaleString('en-IN')}/hr · ₹${mo.toLocaleString('en-IN')}/mo`;
+}
+
+function renderOfflineResults(form) {
+  // Score all
+  const scored = PLATFORMS
+    .map(p => ({ ...p, score: scorePlatform(p, form) }))
+    .filter(p => p.score >= 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+
+  if (!scored.length) {
+    document.getElementById('recCards').innerHTML =
+      '<p style="color:var(--amber);text-align:center;padding:40px">No platforms match all constraints — try relaxing budget or sovereignty filters.</p>';
+    return;
+  }
+
+  const usageLbl = {adhoc:'ad-hoc',daily:`${form.hours} hrs/day`,'247':'24×7'}[form.usage] || form.usage;
+  const projLbl  = document.querySelector(`input[name="projectType"]:checked`)?.closest('.chip')?.querySelector('label')?.textContent?.trim() || form.projectType;
+  const sizeLbl  = document.querySelector(`input[name="modelSize"]:checked`)?.closest('.chip')?.querySelector('label')?.textContent?.trim() || `${form.modelB}B`;
+  document.getElementById('summaryBox').innerHTML =
+    `<div class="summary-box">Showing <strong>${scored.length} best matches</strong> for: <strong>${projLbl}</strong> · <strong>${sizeLbl} models</strong> · <strong>${usageLbl}</strong> · <strong>${form.users} user${form.users>1?'s':''}</strong></div>`;
+
+  const opts = pickOptimisations(form);
+
+  document.getElementById('recCards').innerHTML = scored.map((p, i) => {
+    const isTop = i === 0;
+    const hrs = form.usage === '247' ? 24 : form.usage === 'adhoc' ? 2 : parseInt(form.hours) || 8;
+    const monthly = p.type === 'hourly' ? p.hourlyINR * hrs * 30 : 0;
+    const annual  = p.type === 'hourly' ? monthly * 12 : p.priceINR;
+
+    const tok = form.modelB <= 7 ? `${p.tok7b} tok/s` : p.tok70b > 0 ? `${p.tok70b} tok/s` : 'N/A';
+    const tokColor = p.tok70b > 50 ? 'mv-green' : p.tok70b > 10 ? 'mv-blue' : p.tok70b > 0 ? 'mv-amber' : 'mv-red';
+
+    const sovLabel = p.sovereignty === 'india' ? '🇮🇳 100% India sovereign' : p.sovereignty === 'full' ? '✓ On-prem (full)' : '⚠ Varies by region';
+    const sovClass = p.sovereignty === 'india' ? 'sov' : p.sovereignty === 'full' ? 'sov' : 'sov-warn';
+
+    const optsHtml = (isTop && opts.length) ? `
+      <div class="opts-section">
+        <div class="opts-label">Recommended optimisations for this setup</div>
+        ${opts.map(o => `
+          <div class="opt-row">
+            <span class="opt-icon">${o.icon}</span>
+            <div><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}</div></div>
+            <span class="opt-gain">${o.gain}</span>
+          </div>`).join('')}
+      </div>` : '';
+
+    return `
+      <div class="rec-card${isTop?' top':''}">
+        <div class="rec-head">
+          <span class="rec-rank ${isTop?'rank-top':'rank-n'}">${isTop?'★ TOP PICK':'#'+(i+1)}</span>
+          <span class="rec-name">${p.name.replace('\n','<br><span style="font-size:12px;color:var(--muted)">')+(p.name.includes('\n')?'</span>':'')}</span>
+          <span class="rec-price">${fmtPrice(p, form)}</span>
+          <span class="rec-score">${p.score}/100</span>
+        </div>
+        <div class="rec-body">
+          <div class="metrics-grid">
+            <div class="metric"><div class="metric-label">Token gen</div><div class="metric-val ${tokColor}">${tok}</div></div>
+            <div class="metric"><div class="metric-label">Monthly cost</div><div class="metric-val ${p.type==='hourly'?'mv-amber':'mv-green'}">${p.type==='hourly'?'₹'+monthly.toLocaleString('en-IN'):'₹0 (one-time)'}</div></div>
+            <div class="metric"><div class="metric-label">Annual cost</div><div class="metric-val">₹${annual.toLocaleString('en-IN')}</div></div>
+            <div class="metric"><div class="metric-label">Max model</div><div class="metric-val mv-teal">${p.maxModelB>=999?'Any size':p.maxModelB+'B params'}</div></div>
+            <div class="metric"><div class="metric-label">Power</div><div class="metric-val">${p.power}</div></div>
+            <div class="metric"><div class="metric-label">Max concurrent</div><div class="metric-val ${p.maxUsers>=20?'mv-green':p.maxUsers>=5?'mv-amber':'mv-red'}">${p.maxUsers>=999?'Scalable':p.maxUsers+' users'}</div></div>
+            <div class="metric"><div class="metric-label">CUDA</div><div class="metric-val ${p.cuda?'mv-green':'mv-red'}">${p.cuda?'✓ Yes':'✗ No'}</div></div>
+            <div class="metric"><div class="metric-label">Cooling</div><div class="metric-val">${p.cooling.split('·')[0].trim()}</div></div>
+          </div>
+          <div class="tags">
+            ${p.pros.slice(0,3).map(t=>`<span class="tag good">${t}</span>`).join('')}
+            ${p.cons.slice(0,2).map(t=>`<span class="tag warn">${t}</span>`).join('')}
+            <span class="tag ${sovClass}">${sovLabel}</span>
+          </div>
+          ${optsHtml}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI MODE
+// ═══════════════════════════════════════════════════════════
+async function renderAIResults(form) {
+  document.getElementById('recCards').innerHTML = '';
+  document.getElementById('llmLoading').style.display = 'block';
+  document.getElementById('llmResult').style.display  = 'none';
+
+  const budgetStr = form.budgetType !== 'none'
+    ? `₹${form.budget} (${form.budgetType})`
+    : 'No limit';
+
+  try {
+    const r = await fetch('/api/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        requirements: {
+          usage: form.usage, hours: form.hours,
+          users: form.users + ' concurrent',
+          projectType: form.projectType,
+          modelSize: form.modelB + 'B params',
+          sovereignty: form.sovereignty,
+          cuda: form.cuda, deploy: form.deploy,
+          budget: budgetStr,
+        },
+      }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Request failed');
+    document.getElementById('llmLoading').style.display = 'none';
+    document.getElementById('llmResult').style.display  = 'block';
+    document.getElementById('llmContent').innerHTML = renderMd(d.recommendation);
+  } catch(e) {
+    document.getElementById('llmLoading').style.display = 'none';
+    document.getElementById('llmResult').style.display  = 'block';
+    document.getElementById('llmContent').innerHTML =
+      `<p style="color:var(--red)">⚠️ ${e.message}</p>
+       <p style="color:var(--muted);font-size:13px;margin-top:8px">
+       Falling back to dataset mode…</p>`;
+    // Auto-fallback to offline
+    setTimeout(() => {
+      document.getElementById('llmResult').style.display = 'none';
+      document.getElementById('modeFlag').innerHTML = '<span class="mode-badge offline">⚡ Fell back to Dataset Mode</span>';
+      renderOfflineResults(form);
+    }, 1800);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// MINIMAL MARKDOWN RENDERER
+// ═══════════════════════════════════════════════════════════
+function renderMd(md) {
+  return md
+    .replace(/\|(.+)\|\n\|[-|: ]+\|\n((?:\|.+\|\n?)+)/g, (_, h, rows) => {
+      const ths = h.split('|').filter(s=>s.trim()).map(s=>`<th>${s.trim()}</th>`).join('');
+      const trs = rows.trim().split('\n').map(row=>'<tr>'+row.split('|').filter(s=>s.trim()).map(s=>`<td>${s.trim()}</td>`).join('')+'</tr>').join('');
       return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
     })
-    // Headings
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
-    // Bold
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // Code
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // Blockquote
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    // Lists
-    .replace(/^\s*[-*] (.+)$/gm, '<li>$1</li>')
-    .replace(/((<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>')
-    // Paragraphs
-    .replace(/\n\n(?!<[uoth])/g, '</p><p>')
-    .replace(/^(?!<[uothbl])(.+)$/gm, (l) => l.startsWith('<') ? l : l);
-
-  html = `<p>${html}</p>`;
-  document.getElementById('resultContent').innerHTML = html;
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^# (.+)$/gm,'<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^\s*[-*] (.+)$/gm,'<li>$1</li>')
+    .replace(/((<li>.*<\/li>\n?)+)/g,'<ul>$1</ul>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/^(.)/,'<p>$1');
 }
 </script>
 </body>

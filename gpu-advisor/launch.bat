@@ -19,14 +19,14 @@ if %ERRORLEVEL% NEQ 0 goto :install_node
 
 :: Check version
 for /f "tokens=1" %%V in ('node -e "process.stdout.write(process.version.slice(1).split('.')[0])"') do set NODE_MAJOR=%%V
-if %NODE_MAJOR% LSS 18 goto :install_old_node
+if %NODE_MAJOR% LSS 20 goto :install_old_node
 
 echo   ✓ Node.js is installed ^(v%NODE_MAJOR%+^)
 goto :start_server
 
 :: ── Node.js not found ─────────────────────────────────────────────────────────
 :install_node
-echo   Node.js ^(v18+^) is required but not installed.
+echo   Node.js ^(v20+^) is required but not installed.
 echo.
 set /p CONFIRM="  Allow automatic Node.js installation? [Y/N]: "
 if /i "%CONFIRM%" NEQ "Y" (
@@ -39,7 +39,7 @@ if /i "%CONFIRM%" NEQ "Y" (
 goto :do_install
 
 :install_old_node
-echo   Node.js v%NODE_MAJOR% is installed but too old ^(need v18+^).
+echo   Node.js v%NODE_MAJOR% is installed but too old ^(need v20+^).
 echo.
 set /p CONFIRM="  Allow automatic Node.js upgrade? [Y/N]: "
 if /i "%CONFIRM%" NEQ "Y" (
@@ -86,6 +86,6 @@ echo   → Close this window to stop the server
 echo.
 
 cd /d "%~dp0"
-node server.js
+npm start
 
 pause

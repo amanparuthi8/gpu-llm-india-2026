@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * GPU & LLM Infrastructure Advisor — Local Server
- * Handles Claude Pro setup-token, ChatGPT PKCE OAuth, and API proxying.
- * Zero npm dependencies — pure Node.js built-ins only.
+ * Handles API-key auth for multiple LLM providers, OpenAI Codex OAuth,
+ * and local recommendation proxying.
  */
 
 const http        = require('http');
@@ -12,43 +12,172 @@ const fs          = require('fs');
 const path        = require('path');
 const { exec }    = require('child_process');
 const url         = require('url');
-const querystring = require('querystring');
+const {
+  OPENAI_CODEX_BASE_URL,
+  GOOGLE_GEMINI_CLI_BASE_URL,
+  QWEN_PORTAL_BASE_URL,
+  createDeferred,
+  startOpenAICodexOAuth,
+  refreshOpenAICodexSession,
+  startGeminiCliOAuth,
+  refreshGeminiCliSession,
+  beginQwenDeviceOAuth,
+  pollQwenDeviceOAuth,
+  refreshQwenOAuthSession,
+  normalizeQwenBaseUrl,
+} = require('./oauth-providers.js');
 
 const PORT       = 3131;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
-// ── Anthropic ─────────────────────────────────────────────────────────────────
-// Claude Pro uses `claude setup-token` CLI flow — no browser OAuth exists.
-// Token format: sk-ant-st01-<base64url>
-// Auth header:  Authorization: Bearer <token>  (NOT x-api-key)
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-
-// ── OpenAI / ChatGPT Plus ─────────────────────────────────────────────────────
-// PKCE OAuth via auth.openai.com with the public ChatGPT app client ID.
-const OPENAI_CLIENT_ID = 'app_EMaOOvSrPo4A8cT09XJXO5';
-const OPENAI_AUTH_URL  = 'https://auth.openai.com/authorize';
-const OPENAI_TOKEN_URL = 'https://auth.openai.com/oauth/token';
-const OPENAI_API_URL   = 'https://api.openai.com/v1/chat/completions';
-const OPENAI_SCOPE     = 'openid email profile offline_access model.request model.read organization.read organization.write';
-const OPENAI_AUDIENCE  = 'https://api.openai.com/v1';
+const PROVIDER_CATALOG = {
+  anthropic: {
+    label: 'Anthropic Claude',
+    model: 'claude-sonnet-4-6',
+    api: 'anthropic-messages',
+    baseUrl: 'https://api.anthropic.com/v1',
+    reasoning: true,
+    input: ['text', 'image'],
+    contextWindow: 200000,
+    maxTokens: 64000,
+  },
+  openai: {
+    label: 'OpenAI',
+    model: 'gpt-4o',
+    api: 'openai-completions',
+    baseUrl: 'https://api.openai.com/v1',
+    reasoning: false,
+    input: ['text', 'image'],
+    contextWindow: 128000,
+    maxTokens: 16384,
+  },
+  google: {
+    label: 'Google Gemini',
+    model: 'gemini-2.5-pro',
+    api: 'google-generative-ai',
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+    reasoning: true,
+    input: ['text', 'image'],
+    contextWindow: 1048576,
+    maxTokens: 65536,
+  },
+  'google-gemini-cli': {
+    label: 'Gemini OAuth',
+    model: 'gemini-2.5-pro',
+    api: 'google-gemini-cli',
+    baseUrl: GOOGLE_GEMINI_CLI_BASE_URL,
+    reasoning: true,
+    input: ['text', 'image'],
+    contextWindow: 1048576,
+    maxTokens: 65536,
+  },
+  mistral: {
+    label: 'Mistral',
+    model: 'mistral-large-latest',
+    api: 'openai-completions',
+    baseUrl: 'https://api.mistral.ai/v1',
+    reasoning: false,
+    input: ['text', 'image'],
+    contextWindow: 262144,
+    maxTokens: 16384,
+  },
+  qwen: {
+    label: 'Qwen',
+    model: 'coder-model',
+    api: 'openai-completions',
+    baseUrl: 'https://portal.qwen.ai/v1',
+    reasoning: false,
+    input: ['text'],
+    contextWindow: 128000,
+    maxTokens: 8192,
+  },
+  kimi: {
+    label: 'Kimi',
+    model: 'kimi-code',
+    api: 'anthropic-messages',
+    baseUrl: 'https://api.kimi.com/coding/',
+    reasoning: true,
+    input: ['text', 'image'],
+    contextWindow: 262144,
+    maxTokens: 32768,
+    headers: {
+      'User-Agent': 'claude-code/0.1.0',
+    },
+  },
+  groq: {
+    label: 'Groq',
+    model: 'llama-3.3-70b-versatile',
+    api: 'openai-completions',
+    baseUrl: 'https://api.groq.com/openai/v1',
+    reasoning: false,
+    input: ['text'],
+    contextWindow: 131072,
+    maxTokens: 8192,
+  },
+  deepseek: {
+    label: 'DeepSeek',
+    model: 'deepseek-chat',
+    api: 'openai-completions',
+    baseUrl: 'https://api.deepseek.com/v1',
+    reasoning: true,
+    input: ['text'],
+    contextWindow: 128000,
+    maxTokens: 16384,
+  },
+};
 
 // ── In-memory sessions (nothing written to disk) ──────────────────────────────
 const sessions = new Map();
+const oauthFlows = new Map();
 
-// ── PKCE helpers ──────────────────────────────────────────────────────────────
-const genVerifier  = () => crypto.randomBytes(32).toString('base64url');
-const genChallenge = (v) => crypto.createHash('sha256').update(v).digest('base64url');
-const genState     = () => crypto.randomBytes(16).toString('hex');
 const genSession   = () => crypto.randomBytes(20).toString('hex');
 
 // ── Token format validators ───────────────────────────────────────────────────
-function isValidSetupToken(t) {
-  // claude setup-token output: sk-ant-st01-<base64url chars>
-  return typeof t === 'string' && /^sk-ant-st01-[A-Za-z0-9_-]{20,}$/.test(t.trim());
-}
-function isValidApiKey(t) {
+function isValidApiKey(provider, t) {
   const s = (t || '').trim();
-  return /^sk-ant-api03-/.test(s) || /^sk-[A-Za-z0-9]{20,}/.test(s);
+  if (!s) return false;
+  switch (provider) {
+    case 'anthropic':
+      return /^sk-ant-api03-/.test(s) || s.length >= 24;
+    case 'openai':
+    case 'deepseek':
+      return /^sk-[A-Za-z0-9_-]{16,}/.test(s) || s.length >= 20;
+    case 'groq':
+      return /^gsk_[A-Za-z0-9_-]{16,}/.test(s) || s.length >= 20;
+    case 'google':
+      return /^AIza[0-9A-Za-z_-]{20,}/.test(s) || s.length >= 20;
+    case 'mistral':
+    case 'qwen':
+    case 'kimi':
+      return s.length >= 12;
+    default:
+      return s.length >= 12;
+  }
+}
+
+function isValidSetupToken(t) {
+  const s = (t || '').trim();
+  return /^sk-ant-st01-[A-Za-z0-9_-]{20,}$/.test(s) || s.length >= 32;
+}
+
+function buildEmptyCost() {
+  return { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
+}
+
+function extractAssistantText(message) {
+  if (typeof message?.content === 'string' && message.content.trim()) {
+    return message.content.trim();
+  }
+  const blocks = Array.isArray(message?.content) ? message.content : [];
+  const text = blocks
+    .filter((block) => block && block.type === 'text' && typeof block.text === 'string')
+    .map((block) => block.text)
+    .join('\n')
+    .trim();
+  if (!text) {
+    throw new Error('No text content returned from Codex OAuth session.');
+  }
+  return text;
 }
 
 // ── Open browser cross-platform ───────────────────────────────────────────────
@@ -112,138 +241,448 @@ function serveFile(res, filePath, contentType) {
   });
 }
 
+async function loadPiAiDeps() {
+  const piAi = await import('@mariozechner/pi-ai');
+  return piAi;
+}
+
+async function resolveSessionAccessToken(session) {
+  if (!session?.tokens?.access) {
+    throw new Error('Missing session token.');
+  }
+
+  if (session.provider === 'google-gemini-cli') {
+    if (!session.tokens.projectId) {
+      throw new Error('Gemini OAuth session missing project ID. Sign in again.');
+    }
+    if (session.tokens.refresh && session.tokens.expires < Date.now()) {
+      session.tokens = await refreshGeminiCliSession(session.tokens);
+    } else if (session.tokens.expires < Date.now()) {
+      throw new Error('Gemini OAuth session expired. Sign in again.');
+    }
+    return JSON.stringify({
+      token: session.tokens.access,
+      projectId: session.tokens.projectId,
+    });
+  }
+
+  if (session.provider === 'qwen' && session.authMode === 'oauth') {
+    if (session.tokens.refresh && session.tokens.expires < Date.now()) {
+      session.tokens = await refreshQwenOAuthSession(session.tokens);
+      if (session.tokens.resourceUrl) {
+        session.baseUrl = normalizeQwenBaseUrl(session.tokens.resourceUrl);
+      }
+    } else if (session.tokens.expires < Date.now()) {
+      throw new Error('Qwen OAuth session expired. Sign in again.');
+    }
+    return session.tokens.access;
+  }
+
+  if (session.provider !== 'openai-codex') {
+    if (session.tokens.expires < Date.now()) {
+      throw new Error('Session expired. Sign in again.');
+    }
+    return session.tokens.access;
+  }
+
+  if (!session.tokens.refresh) {
+    if (session.tokens.expires < Date.now()) {
+      throw new Error('OpenAI Codex session expired. Sign in again.');
+    }
+    return session.tokens.access;
+  }
+
+  const refreshed = await refreshOpenAICodexSession(session.tokens);
+  session.tokens = refreshed.tokens;
+  return refreshed.apiKey;
+}
+
+function buildRuntimeModel(providerId) {
+  if (providerId === 'openai-codex') {
+    return {
+      id: 'gpt-5.4',
+      name: 'gpt-5.4',
+      provider: 'openai-codex',
+      api: 'openai-codex-responses',
+      baseUrl: OPENAI_CODEX_BASE_URL,
+      reasoning: true,
+      input: ['text'],
+      cost: buildEmptyCost(),
+      contextWindow: 1050000,
+      maxTokens: 128000,
+    };
+  }
+
+  const provider = PROVIDER_CATALOG[providerId];
+  if (!provider) {
+    throw new Error(`Unsupported provider: ${providerId}`);
+  }
+
+  return {
+    id: provider.model,
+    name: provider.model,
+    provider: providerId,
+    api: provider.api,
+    baseUrl: provider.baseUrl,
+    reasoning: provider.reasoning,
+    input: provider.input,
+    cost: buildEmptyCost(),
+    contextWindow: provider.contextWindow,
+    maxTokens: provider.maxTokens,
+    ...(provider.headers ? { headers: provider.headers } : {}),
+  };
+}
+
+function callAnthropicText(token, prompt, authMode = 'api-key') {
+  const payload = JSON.stringify({
+    model: PROVIDER_CATALOG.anthropic.model,
+    max_tokens: 1500,
+    messages: [{ role: 'user', content: prompt }],
+  });
+
+  const authHeaders =
+    authMode === 'setup-token'
+      ? { Authorization: `Bearer ${token}` }
+      : { 'x-api-key': token };
+
+  return new Promise((resolve, reject) => {
+    const req = https.request({
+      hostname: 'api.anthropic.com',
+      port: 443,
+      path: '/v1/messages',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'Content-Length': Buffer.byteLength(payload),
+        ...authHeaders,
+      },
+    }, (r) => {
+      const chunks = [];
+      r.on('data', c => chunks.push(c));
+      r.on('end', () => {
+        const raw = Buffer.concat(chunks).toString();
+        try {
+          const json = JSON.parse(raw);
+          if (json.error) {
+            return reject(new Error(`Anthropic error: ${json.error.message || JSON.stringify(json.error)}`));
+          }
+          const text = json.content?.[0]?.text;
+          if (text) return resolve(text);
+          reject(new Error(`No content in response: ${raw.slice(0, 200)}`));
+        } catch {
+          reject(new Error(`Parse error: ${raw.slice(0, 200)}`));
+        }
+      });
+    });
+    req.on('error', reject);
+    req.write(payload);
+    req.end();
+  });
+}
+
+async function completeWithProvider(session, token, prompt) {
+  if (session.provider === 'anthropic') {
+    return await callAnthropicText(token, prompt, session.authMode || 'api-key');
+  }
+
+  const providerId = session.provider;
+  const runtimeModel = buildRuntimeModel(providerId);
+  if (providerId === 'qwen' && session.baseUrl) {
+    runtimeModel.baseUrl = session.baseUrl;
+  }
+  const { complete } = await loadPiAiDeps();
+  const result = await complete(
+    runtimeModel,
+    {
+      messages: [{ role: 'user', content: prompt, timestamp: Date.now() }],
+    },
+    {
+      apiKey: token,
+      maxTokens: 1500,
+      transport: 'auto',
+    },
+  );
+
+  return extractAssistantText(result);
+}
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 
-// POST /auth/start  { provider: 'claude' | 'chatgpt' }
-async function handleAuthStart(req, res) {
+// POST /api/gemini/start
+async function handleGeminiOAuthStart(_req, res) {
+  const flowId = genSession();
+  const sessionId = genSession();
+  const manualCode = createDeferred();
+  const flow = {
+    status: 'pending',
+    sessionId,
+    authUrl: '',
+    error: '',
+    instructions: '',
+    manualCode,
+  };
+  oauthFlows.set(flowId, flow);
+
+  try {
+    void startGeminiCliOAuth({
+      openUrl: openBrowser,
+      waitForManualCode: async () => await manualCode.promise,
+      onAuthUrl: (authUrl) => {
+        flow.authUrl = authUrl;
+      },
+      onInstructions: (instructions) => {
+        flow.instructions = instructions || '';
+      },
+      onProgress: () => {},
+    })
+      .then((creds) => {
+        sessions.set(sessionId, {
+          provider: 'google-gemini-cli',
+          authMode: 'oauth',
+          tokens: {
+            access: creds.access,
+            refresh: creds.refresh,
+            expires: creds.expires,
+            projectId: creds.projectId,
+            isOAuth: true,
+          },
+        });
+        flow.status = 'complete';
+      })
+      .catch((err) => {
+        flow.status = 'error';
+        flow.error = err instanceof Error ? err.message : String(err);
+      });
+
+    sendJSON(res, 200, {
+      flowId,
+      sessionId,
+      authUrl: flow.authUrl || null,
+      instructions: flow.instructions || null,
+    });
+  } catch (err) {
+    oauthFlows.delete(flowId);
+    sendJSON(res, 500, { error: err instanceof Error ? err.message : String(err) });
+  }
+}
+
+// POST /api/gemini/status
+async function handleGeminiOAuthStatus(req, res) {
   try {
     const data = JSON.parse(await readBody(req));
-
-    if (data.provider === 'claude') {
-      const sessionId = genSession();
-      sessions.set(sessionId, { provider: 'claude', tokens: null });
-      return sendJSON(res, 200, { sessionId, flow: 'paste' });
-    }
-
-    if (data.provider === 'chatgpt') {
-      const sessionId = genSession();
-      const verifier  = genVerifier();
-      const challenge = genChallenge(verifier);
-      const state     = genState();
-
-      sessions.set(sessionId, { provider: 'chatgpt', verifier, state, tokens: null });
-
-      const params = new URLSearchParams({
-        response_type:         'code',
-        client_id:             OPENAI_CLIENT_ID,
-        redirect_uri:          `http://localhost:${PORT}/auth/callback`,
-        scope:                 OPENAI_SCOPE,
-        code_challenge:        challenge,
-        code_challenge_method: 'S256',
-        state:                 `${sessionId}:${state}`,
-        audience:              OPENAI_AUDIENCE,
-      });
-
-      return sendJSON(res, 200, {
-        sessionId,
-        flow:    'browser',
-        authUrl: `${OPENAI_AUTH_URL}?${params}`,
-      });
-    }
-
-    sendJSON(res, 400, { error: 'Unknown provider.' });
-
-  } catch (err) {
-    console.error('[/auth/start]', err);
-    sendJSON(res, 500, { error: err.message });
-  }
-}
-
-// POST /auth/token  { sessionId, token }  — Claude setup-token paste
-async function handleAuthToken(req, res) {
-  try {
-    const data    = JSON.parse(await readBody(req));
-    const session = sessions.get(data.sessionId);
-    if (!session) return sendJSON(res, 404, { error: 'Session not found. Reload and try again.' });
-
-    const token = (data.token || '').trim();
-    if (!token) return sendJSON(res, 400, { error: 'Token is empty.' });
-
-    if (!isValidSetupToken(token)) {
-      return sendJSON(res, 400, {
-        error: `Token format invalid. Expected: sk-ant-st01-<long string>. ` +
-               `Copy the FULL token printed by "claude setup-token" — not the export command, just the token value.`,
-      });
-    }
-
-    session.tokens = { access: token, isOAuth: true, expires: Date.now() + 3600 * 1000 };
-    sendJSON(res, 200, { authed: true });
-
-  } catch (err) {
-    console.error('[/auth/token]', err);
-    sendJSON(res, 500, { error: err.message });
-  }
-}
-
-// GET /auth/callback  — ChatGPT OAuth redirect
-async function handleAuthCallback(req, res) {
-  try {
-    const q = url.parse(req.url, true).query;
-
-    if (q.error) return res.end(callbackPage('error', `OAuth denied: ${q.error}`));
-
-    const [sessionId, stateToken] = (q.state || '').split(':');
-    const session = sessions.get(sessionId);
-
-    if (!session || session.state !== stateToken) {
-      return res.end(callbackPage('error', 'State mismatch. Please try again.'));
-    }
-
-    const body = querystring.stringify({
-      grant_type:    'authorization_code',
-      code:          q.code,
-      redirect_uri:  `http://localhost:${PORT}/auth/callback`,
-      client_id:     OPENAI_CLIENT_ID,
-      code_verifier: session.verifier,
-    });
-
-    const r = await httpsPost(OPENAI_TOKEN_URL, body, {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    });
-
-    if (r.status !== 200 || !r.body?.access_token) {
-      console.error('[/auth/callback] token exchange failed:', r.status, r.body);
-      return res.end(callbackPage('error',
-        `Token exchange failed (${r.status}): ${r.body?.error_description || JSON.stringify(r.body).slice(0, 200)}`
-      ));
-    }
-
-    session.tokens = {
-      access:  r.body.access_token,
-      refresh: r.body.refresh_token,
-      expires: Date.now() + (r.body.expires_in || 3600) * 1000,
-    };
-
-    res.writeHead(302, { Location: `/?session=${sessionId}&provider=chatgpt&authed=1` });
-    res.end();
-
-  } catch (err) {
-    console.error('[/auth/callback]', err);
-    res.end(callbackPage('error', err.message));
-  }
-}
-
-// POST /auth/status  { sessionId }
-async function handleAuthStatus(req, res) {
-  try {
-    const data    = JSON.parse(await readBody(req));
-    const session = sessions.get(data.sessionId);
-    if (!session) return sendJSON(res, 200, { authed: false });
+    const flow = oauthFlows.get(data.flowId);
+    if (!flow) return sendJSON(res, 404, { error: 'Gemini OAuth flow not found. Start again.' });
     sendJSON(res, 200, {
-      authed:   !!session.tokens,
-      provider: session.provider,
-      expired:  session.tokens ? session.tokens.expires < Date.now() : false,
+      status: flow.status,
+      sessionId: flow.status === 'complete' ? flow.sessionId : null,
+      authUrl: flow.authUrl || null,
+      instructions: flow.instructions || null,
+      error: flow.error || null,
     });
+  } catch (err) {
+    sendJSON(res, 500, { error: err.message });
+  }
+}
+
+// POST /api/gemini/code
+async function handleGeminiOAuthCode(req, res) {
+  try {
+    const data = JSON.parse(await readBody(req));
+    const flow = oauthFlows.get(data.flowId);
+    if (!flow) return sendJSON(res, 404, { error: 'Gemini OAuth flow not found. Start again.' });
+    const code = String(data.code || '').trim();
+    if (!code) return sendJSON(res, 400, { error: 'Redirect URL is empty.' });
+    flow.manualCode.resolve(code);
+    sendJSON(res, 200, { ok: true });
+  } catch (err) {
+    sendJSON(res, 500, { error: err.message });
+  }
+}
+
+// POST /api/qwen/start
+async function handleQwenOAuthStart(_req, res) {
+  const flowId = genSession();
+  const sessionId = genSession();
+  const flow = {
+    status: 'pending',
+    sessionId,
+    authUrl: '',
+    userCode: '',
+    error: '',
+  };
+  oauthFlows.set(flowId, flow);
+
+  try {
+    const device = await beginQwenDeviceOAuth({
+      openUrl: openBrowser,
+      onAuthUrl: (authUrl) => {
+        flow.authUrl = authUrl;
+      },
+      onUserCode: (userCode) => {
+        flow.userCode = userCode;
+      },
+    });
+
+    void (async () => {
+      const start = Date.now();
+      let pollIntervalMs = device.intervalMs;
+      const timeoutMs = device.expiresIn * 1000;
+
+      while (Date.now() - start < timeoutMs) {
+        const result = await pollQwenDeviceOAuth({
+          deviceCode: device.deviceCode,
+          verifier: device.verifier,
+        });
+        if (result.status === 'success') {
+          sessions.set(sessionId, {
+            provider: 'qwen',
+            authMode: 'oauth',
+            baseUrl: normalizeQwenBaseUrl(result.token.resourceUrl),
+            tokens: {
+              access: result.token.access,
+              refresh: result.token.refresh,
+              expires: result.token.expires,
+              resourceUrl: result.token.resourceUrl,
+              isOAuth: true,
+            },
+          });
+          flow.status = 'complete';
+          return;
+        }
+        if (result.status === 'error') {
+          flow.status = 'error';
+          flow.error = result.message;
+          return;
+        }
+        if (result.slowDown) {
+          pollIntervalMs = Math.min(pollIntervalMs * 1.5, 10000);
+        }
+        await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+      }
+
+      flow.status = 'error';
+      flow.error = 'Qwen OAuth timed out waiting for authorization.';
+    })().catch((err) => {
+      flow.status = 'error';
+      flow.error = err instanceof Error ? err.message : String(err);
+    });
+
+    sendJSON(res, 200, {
+      flowId,
+      sessionId,
+      authUrl: flow.authUrl,
+      userCode: flow.userCode,
+    });
+  } catch (err) {
+    oauthFlows.delete(flowId);
+    sendJSON(res, 500, { error: err instanceof Error ? err.message : String(err) });
+  }
+}
+
+// POST /api/qwen/status
+async function handleQwenOAuthStatus(req, res) {
+  try {
+    const data = JSON.parse(await readBody(req));
+    const flow = oauthFlows.get(data.flowId);
+    if (!flow) return sendJSON(res, 404, { error: 'Qwen OAuth flow not found. Start again.' });
+    sendJSON(res, 200, {
+      status: flow.status,
+      sessionId: flow.status === 'complete' ? flow.sessionId : null,
+      authUrl: flow.authUrl || null,
+      userCode: flow.userCode || null,
+      error: flow.error || null,
+    });
+  } catch (err) {
+    sendJSON(res, 500, { error: err.message });
+  }
+}
+
+// POST /api/openai-codex/start
+async function handleOpenAICodexStart(_req, res) {
+  const flowId = genSession();
+  const sessionId = genSession();
+  const manualCode = createDeferred();
+  const flow = {
+    status: 'pending',
+    sessionId,
+    authUrl: '',
+    error: '',
+    manualCode,
+  };
+  oauthFlows.set(flowId, flow);
+
+  try {
+    void startOpenAICodexOAuth({
+      openUrl: openBrowser,
+      waitForManualCode: async () => await manualCode.promise,
+      onAuthUrl: (authUrl) => {
+        flow.authUrl = authUrl;
+      },
+      onProgress: () => {},
+    })
+      .then((creds) => {
+        sessions.set(sessionId, {
+          provider: 'openai-codex',
+          tokens: {
+            access: creds.access,
+            refresh: creds.refresh,
+            expires: creds.expires,
+            accountId: creds.accountId,
+            isOAuth: true,
+          },
+        });
+        flow.status = 'complete';
+      })
+      .catch((err) => {
+        flow.status = 'error';
+        flow.error = err instanceof Error ? err.message : String(err);
+      });
+
+    sendJSON(res, 200, { flowId, sessionId, authUrl: flow.authUrl || null });
+  } catch (err) {
+    oauthFlows.delete(flowId);
+    sendJSON(res, 500, {
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+}
+
+// POST /api/openai-codex/status { flowId }
+async function handleOpenAICodexStatus(req, res) {
+  try {
+    const data = JSON.parse(await readBody(req));
+    const flow = oauthFlows.get(data.flowId);
+    if (!flow) {
+      return sendJSON(res, 404, { error: 'OAuth flow not found. Start again.' });
+    }
+    sendJSON(res, 200, {
+      status: flow.status,
+      sessionId: flow.status === 'complete' ? flow.sessionId : null,
+      authUrl: flow.authUrl || null,
+      error: flow.error || null,
+    });
+  } catch (err) {
+    sendJSON(res, 500, { error: err.message });
+  }
+}
+
+// POST /api/openai-codex/code { flowId, code }
+async function handleOpenAICodexCode(req, res) {
+  try {
+    const data = JSON.parse(await readBody(req));
+    const flow = oauthFlows.get(data.flowId);
+    if (!flow) {
+      return sendJSON(res, 404, { error: 'OAuth flow not found. Start again.' });
+    }
+
+    const code = String(data.code || '').trim();
+    if (!code) {
+      return sendJSON(res, 400, { error: 'Authorization code is empty.' });
+    }
+
+    flow.manualCode.resolve(code);
+    sendJSON(res, 200, { ok: true });
   } catch (err) {
     sendJSON(res, 500, { error: err.message });
   }
@@ -253,16 +692,30 @@ async function handleAuthStatus(req, res) {
 async function handleBYOK(req, res) {
   try {
     const data = JSON.parse(await readBody(req));
+    const provider = String(data.provider || '').trim();
+    const authMode = String(data.authMode || 'api-key').trim();
     const key  = (data.apiKey || '').trim();
 
     if (!key) return sendJSON(res, 400, { error: 'API key is empty.' });
-    if (!isValidApiKey(key)) return sendJSON(res, 400, {
-      error: 'Key format invalid. Claude keys start with sk-ant-api03-, OpenAI keys start with sk-.',
-    });
+    if (!PROVIDER_CATALOG[provider]) {
+      return sendJSON(res, 400, { error: 'Unsupported provider.' });
+    }
+    if (provider === 'anthropic' && authMode === 'setup-token') {
+      if (!isValidSetupToken(key)) {
+        return sendJSON(res, 400, {
+          error: 'Claude setup-token format looks invalid. Run `claude setup-token` and paste the full token value.',
+        });
+      }
+    } else if (!isValidApiKey(provider, key)) {
+      return sendJSON(res, 400, {
+        error: `Key format does not look valid for ${PROVIDER_CATALOG[provider].label}.`,
+      });
+    }
 
     const sessionId = genSession();
     sessions.set(sessionId, {
-      provider: data.provider || 'claude',
+      provider,
+      authMode,
       tokens:   { access: key, isApiKey: true, expires: Date.now() + 86400000 },
     });
     sendJSON(res, 200, { sessionId, authed: true });
@@ -279,18 +732,11 @@ async function handleRecommend(req, res) {
     const session = sessions.get(data.sessionId);
 
     if (!session?.tokens) return sendJSON(res, 401, { error: 'Not authenticated.' });
-    if (session.tokens.expires < Date.now()) return sendJSON(res, 401, { error: 'Session expired. Sign in again.' });
 
-    const token  = session.tokens.access;
-    const isKey  = !!session.tokens.isApiKey;
+    const token  = await resolveSessionAccessToken(session);
     const prompt = buildPrompt(data.requirements);
 
-    let result;
-    if (session.provider === 'chatgpt') {
-      result = await callOpenAI(token, prompt);
-    } else {
-      result = await callClaude(token, prompt, isKey);
-    }
+    const result = await completeWithProvider(session, token, prompt);
 
     sendJSON(res, 200, { recommendation: result });
 
@@ -298,85 +744,6 @@ async function handleRecommend(req, res) {
     console.error('[/api/recommend]', err);
     sendJSON(res, 500, { error: err.message });
   }
-}
-
-// ── Anthropic API ─────────────────────────────────────────────────────────────
-function callClaude(token, prompt, isApiKey) {
-  const payload = JSON.stringify({
-    model: 'claude-sonnet-4-6', max_tokens: 1500,
-    messages: [{ role: 'user', content: prompt }],
-  });
-
-  // setup-token (OAuth) → Authorization: Bearer <token>
-  // direct API key      → x-api-key: <key>
-  const authHeaders = isApiKey
-    ? { 'x-api-key': token }
-    : { 'Authorization': `Bearer ${token}` };
-
-  return new Promise((resolve, reject) => {
-    const req = https.request({
-      hostname: 'api.anthropic.com', port: 443,
-      path: '/v1/messages', method: 'POST',
-      headers: {
-        'Content-Type':      'application/json',
-        'anthropic-version': '2023-06-01',
-        'Content-Length':    Buffer.byteLength(payload),
-        ...authHeaders,
-      },
-    }, (r) => {
-      const chunks = [];
-      r.on('data', c => chunks.push(c));
-      r.on('end', () => {
-        const raw = Buffer.concat(chunks).toString();
-        try {
-          const json = JSON.parse(raw);
-          if (json.error) return reject(new Error(`Anthropic error: ${json.error.message || JSON.stringify(json.error)}`));
-          const text = json.content?.[0]?.text;
-          if (text) return resolve(text);
-          reject(new Error(`No content in response: ${raw.slice(0, 200)}`));
-        } catch { reject(new Error(`Parse error: ${raw.slice(0, 200)}`)); }
-      });
-    });
-    req.on('error', reject);
-    req.write(payload);
-    req.end();
-  });
-}
-
-// ── OpenAI API ────────────────────────────────────────────────────────────────
-function callOpenAI(token, prompt) {
-  const payload = JSON.stringify({
-    model: 'gpt-4o', max_tokens: 1500,
-    messages: [{ role: 'user', content: prompt }],
-  });
-
-  return new Promise((resolve, reject) => {
-    const req = https.request({
-      hostname: 'api.openai.com', port: 443,
-      path: '/v1/chat/completions', method: 'POST',
-      headers: {
-        'Content-Type':   'application/json',
-        'Authorization':  `Bearer ${token}`,
-        'Content-Length': Buffer.byteLength(payload),
-      },
-    }, (r) => {
-      const chunks = [];
-      r.on('data', c => chunks.push(c));
-      r.on('end', () => {
-        const raw = Buffer.concat(chunks).toString();
-        try {
-          const json = JSON.parse(raw);
-          if (json.error) return reject(new Error(`OpenAI error: ${json.error.message || JSON.stringify(json.error)}`));
-          const text = json.choices?.[0]?.message?.content;
-          if (text) return resolve(text);
-          reject(new Error(`No content in response: ${raw.slice(0, 200)}`));
-        } catch { reject(new Error(`Parse error: ${raw.slice(0, 200)}`)); }
-      });
-    });
-    req.on('error', reject);
-    req.write(payload);
-    req.end();
-  });
 }
 
 // ── Recommendation prompt ─────────────────────────────────────────────────────
@@ -420,21 +787,6 @@ Respond in this exact structure:
 Reference prices: DGX Spark ₹4,06,454 · ASUS GX10 ₹3,02,500 · MSI EdgeXpert ₹2,59,500 · Dell Pro Max GB10 ~₹3,46,000 · HP ZGX Nano ~₹2,59,500 · Mac Mini M4 Pro 64GB ₹1,69,900 · Mac Studio M4 Max ₹4,19,000 · Minisforum MS-S1 Max ~₹1,75,000 · Jetson AGX Thor ₹2,16,250 · Jetson Orin Nano Super ₹21,600 · TAALAS 10×RTX4090 ₹38-43L · Yotta Shakti ₹115-400/hr · E2E Networks ₹150-250/hr · Oracle Cloud ₹108/hr/GPU · AWS p5 ₹340/hr · GCP A3 ₹260/hr`;
 }
 
-// ── OAuth callback page ───────────────────────────────────────────────────────
-function callbackPage(status, msg) {
-  const ok = status !== 'error';
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${ok ? 'Signed in' : 'Error'}</title>
-<style>body{font-family:system-ui;background:#0a0e1a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
-.c{background:#111827;border:1px solid rgba(99,179,237,.2);border-radius:16px;padding:40px;text-align:center;max-width:440px}
-h2{color:${ok ? '#68d391' : '#fc8181'};margin:0 0 12px}p{color:#718096;font-size:14px;margin:0 0 24px}
-button{background:linear-gradient(135deg,#2b6cb0,#1a4f8a);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:14px;cursor:pointer}</style>
-</head><body><div class="c">
-<h2>${ok ? '✓ Signed in!' : '✗ Error'}</h2>
-<p>${msg || (ok ? 'You can close this tab and return to the advisor.' : 'Something went wrong.')}</p>
-<button onclick="window.close()">Close tab</button>
-</div>${ok ? '<script>setTimeout(()=>window.close(),1500)</script>' : ''}</body></html>`;
-}
-
 // ── HTTP server ───────────────────────────────────────────────────────────────
 const server = http.createServer((req, res) => {
   const { pathname } = url.parse(req.url);
@@ -444,10 +796,14 @@ const server = http.createServer((req, res) => {
     return res.end();
   }
 
-  if (pathname === '/auth/start'    && req.method === 'POST') return handleAuthStart(req, res);
-  if (pathname === '/auth/token'    && req.method === 'POST') return handleAuthToken(req, res);
-  if (pathname === '/auth/callback' && req.method === 'GET' ) return handleAuthCallback(req, res);
-  if (pathname === '/auth/status'   && req.method === 'POST') return handleAuthStatus(req, res);
+  if (pathname === '/api/openai-codex/start'  && req.method === 'POST') return handleOpenAICodexStart(req, res);
+  if (pathname === '/api/openai-codex/status' && req.method === 'POST') return handleOpenAICodexStatus(req, res);
+  if (pathname === '/api/openai-codex/code'   && req.method === 'POST') return handleOpenAICodexCode(req, res);
+  if (pathname === '/api/gemini/start'        && req.method === 'POST') return handleGeminiOAuthStart(req, res);
+  if (pathname === '/api/gemini/status'       && req.method === 'POST') return handleGeminiOAuthStatus(req, res);
+  if (pathname === '/api/gemini/code'         && req.method === 'POST') return handleGeminiOAuthCode(req, res);
+  if (pathname === '/api/qwen/start'          && req.method === 'POST') return handleQwenOAuthStart(req, res);
+  if (pathname === '/api/qwen/status'         && req.method === 'POST') return handleQwenOAuthStatus(req, res);
   if (pathname === '/api/byok'      && req.method === 'POST') return handleBYOK(req, res);
   if (pathname === '/api/recommend' && req.method === 'POST') return handleRecommend(req, res);
 
